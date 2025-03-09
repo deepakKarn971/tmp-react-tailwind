@@ -14,7 +14,7 @@ const Dashboard = () => {
     // This will run on every navigation/location change
     // Check if user is authenticated
     if (!checkCookie(AUTH_CONFIG.AUTH_COOKIE_NAME)) {
-      navigate("/auth/login", { replace: true });
+      navigate("/auth/login");
       return;
     }
 
@@ -38,7 +38,7 @@ const Dashboard = () => {
 
   const handleLogout = () => {
     deleteCookie(AUTH_CONFIG.AUTH_COOKIE_NAME);
-    navigate("/auth/login", { replace: true });
+    navigate("/auth/login");
   };
 
   if (loading) {

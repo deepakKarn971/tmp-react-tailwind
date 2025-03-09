@@ -19,7 +19,7 @@ const Login = () => {
     // Check if token exists, redirect to dashboard if it does
     // This will run on every navigation/location change
     if (checkCookie(AUTH_CONFIG.AUTH_COOKIE_NAME)) {
-      navigate("/dashboard", { replace: true });
+      navigate("/dashboard");
     }
   }, [navigate, location]);
 
@@ -39,7 +39,7 @@ const Login = () => {
       setCookie(AUTH_CONFIG.AUTH_COOKIE_NAME, data.token, AUTH_CONFIG.TOKEN_EXPIRY_DAYS);
       
       // Redirect to dashboard
-      navigate("/dashboard", { replace: true });
+      navigate("/dashboard");
     } catch (err) {
       setError(err.message || "An error occurred during login");
     } finally {
