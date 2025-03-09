@@ -1,17 +1,55 @@
 
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, LogIn } from "lucide-react";
+import { setCookie, checkCookie } from "../utils/cookieUtils";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    // Check if token exists, redirect to dashboard if it does
+    if (checkCookie("auth_token")) {
+      navigate("/dashboard");
+    }
+  }, [navigate]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login attempt with:", { email, password });
-    // Handle login logic here
+    setError("");
+    setIsLoading(true);
+
+    try {
+      // API call to the login endpoint
+      const response = await fetch("https://merchant-cug.twidpay.com/dashboard/auth-dashboard/v1/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed");
+      }
+
+      // Set the token in a cookie with an expiry of 1 day
+      setCookie("auth_token", data.token, 1);
+      
+      // Redirect to dashboard
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err.message || "An error occurred during login");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -30,6 +68,12 @@ const Login = () => {
         </div>
 
         <h2 className="text-xl font-semibold text-left mb-6 text-primary">SIGN IN</h2>
+
+        {error && (
+          <div className="mb-4 p-2 bg-red-50 text-red-600 rounded border border-red-200">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -82,9 +126,16 @@ const Login = () => {
 
           <button
             type="submit"
+            disabled={isLoading}
             className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
           >
-            <LogIn className="h-5 w-5 mr-2" /> SIGN IN
+            {isLoading ? (
+              "SIGNING IN..."
+            ) : (
+              <>
+                <LogIn className="h-5 w-5 mr-2" /> SIGN IN
+              </>
+            )}
           </button>
         </form>
       </div>
