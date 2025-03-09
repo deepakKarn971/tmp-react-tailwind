@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { checkCookie, deleteCookie } from "../utils/cookieUtils";
+import { AUTH_CONFIG } from "../config/env";
 
 const Dashboard = () => {
   const [userData, setUserData] = useState(null);
@@ -10,7 +11,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     // Check if user is authenticated
-    if (!checkCookie("auth_token")) {
+    if (!checkCookie(AUTH_CONFIG.AUTH_COOKIE_NAME)) {
       navigate("/auth/login");
       return;
     }
@@ -34,7 +35,7 @@ const Dashboard = () => {
   }, [navigate]);
 
   const handleLogout = () => {
-    deleteCookie("auth_token");
+    deleteCookie(AUTH_CONFIG.AUTH_COOKIE_NAME);
     navigate("/auth/login");
   };
 
