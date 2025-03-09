@@ -36,7 +36,17 @@ const Header = () => {
   return (
     <header className="bg-white shadow-sm z-10">
       <div className="h-16 px-4 flex items-center justify-between">
-        <div className="text-xl font-semibold">Dashboard</div>
+        <div className="flex items-center">
+          <div className="bg-black rounded-full p-2 mr-2">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L19 7V17L12 22L5 17V7L12 2Z" fill="white" />
+            </svg>
+          </div>
+          <div className="flex items-center">
+            <span className="text-2xl font-bold">twid</span>
+            <sup className="text-xs">™</sup>
+          </div>
+        </div>
 
         <div className="flex items-center space-x-4">
           <div className="relative" ref={dropdownRef}>
