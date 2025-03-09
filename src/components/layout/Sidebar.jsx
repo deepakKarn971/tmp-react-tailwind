@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Layers, FileText, CreditCard, RefreshCcw, ChevronDown, ChevronRight, Menu, X } from "lucide-react";
+import { LayoutDashboard, Layers, FileText, Menu, X, ChevronDown, ChevronRight } from "lucide-react";
 
 const Sidebar = () => {
   const location = useLocation();
@@ -79,24 +79,31 @@ const Sidebar = () => {
         }`}
       >
         <div className="flex h-16 items-center px-4 border-b border-sidebar-border">
-          <div className="flex items-center">
-            <div className="bg-black rounded-full p-2 mr-2">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2L19 7V17L12 22L5 17V7L12 2Z" fill="white" />
-              </svg>
-            </div>
-            {isOpen && (
+          {isOpen ? (
+            <div className="flex items-center">
+              <div className="bg-black rounded-full p-2 mr-2">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2L19 7V17L12 22L5 17V7L12 2Z" fill="white" />
+                </svg>
+              </div>
               <div className="flex items-center">
                 <span className="text-2xl font-bold">twid</span>
                 <sup className="text-xs">™</sup>
               </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <button 
+              className="p-2 rounded-md hover:bg-gray-200"
+              onClick={toggleSidebar}
+            >
+              <Menu size={24} />
+            </button>
+          )}
           <button
             className="ml-auto hidden lg:block"
             onClick={toggleSidebar}
           >
-            {isOpen ? <ChevronRight size={20} /> : <Menu size={20} />}
+            {isOpen ? <ChevronRight size={20} /> : null}
           </button>
         </div>
 
