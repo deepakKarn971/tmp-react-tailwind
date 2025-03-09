@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff, LogIn } from "lucide-react";
 import { setCookie, checkCookie } from "../utils/cookieUtils";
 import { loginApi } from "../utils/api";
@@ -12,13 +13,15 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     // Check if token exists, redirect to dashboard if it does
+    // This will run on every navigation/location change
     if (checkCookie(AUTH_CONFIG.AUTH_COOKIE_NAME)) {
-      navigate("/dashboard");
+      navigate("/dashboard", { replace: true });
     }
-  }, [navigate]);
+  }, [navigate, location]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,7 +39,7 @@ const Login = () => {
       setCookie(AUTH_CONFIG.AUTH_COOKIE_NAME, data.token, AUTH_CONFIG.TOKEN_EXPIRY_DAYS);
       
       // Redirect to dashboard
-      navigate("/dashboard");
+      navigate("/dashboard", { replace: true });
     } catch (err) {
       setError(err.message || "An error occurred during login");
     } finally {

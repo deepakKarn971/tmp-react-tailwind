@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { checkCookie, deleteCookie } from "../utils/cookieUtils";
 import { AUTH_CONFIG } from "../config/env";
 
@@ -8,11 +8,13 @@ const Dashboard = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
+    // This will run on every navigation/location change
     // Check if user is authenticated
     if (!checkCookie(AUTH_CONFIG.AUTH_COOKIE_NAME)) {
-      navigate("/auth/login");
+      navigate("/auth/login", { replace: true });
       return;
     }
 
@@ -32,11 +34,11 @@ const Dashboard = () => {
     };
 
     fetchData();
-  }, [navigate]);
+  }, [navigate, location]);
 
   const handleLogout = () => {
     deleteCookie(AUTH_CONFIG.AUTH_COOKIE_NAME);
-    navigate("/auth/login");
+    navigate("/auth/login", { replace: true });
   };
 
   if (loading) {
