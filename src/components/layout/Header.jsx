@@ -1,11 +1,11 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronDown, LogOut, User } from "lucide-react";
+import { ChevronDown, LogOut, User, Menu } from "lucide-react";
 import { deleteCookie } from "../../utils/cookieUtils";
 import { AUTH_CONFIG } from "../../config/env";
 
-const Header = () => {
+const Header = ({ toggleSidebar }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
@@ -36,7 +36,15 @@ const Header = () => {
   return (
     <header className="bg-white shadow-sm z-10">
       <div className="h-16 px-4 flex items-center justify-between">
-        <div className="text-xl font-semibold">Dashboard</div>
+        <div className="flex items-center">
+          <button
+            onClick={toggleSidebar}
+            className="p-2 rounded-md hover:bg-gray-200 mr-2"
+          >
+            <Menu size={24} />
+          </button>
+          <div className="text-xl font-semibold">Dashboard</div>
+        </div>
 
         <div className="flex items-center space-x-4">
           <div className="relative" ref={dropdownRef}>
@@ -52,7 +60,7 @@ const Header = () => {
             </button>
 
             {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+              <div className="absolute right-0 mt-2 w-full min-w-[192px] bg-white rounded-md shadow-lg py-1 z-50">
                 <div className="px-4 py-3 border-b border-gray-100">
                   <p className="text-sm font-semibold">Account Actions</p>
                 </div>

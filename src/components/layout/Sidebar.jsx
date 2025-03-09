@@ -1,18 +1,13 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { LayoutDashboard, Layers, FileText, Menu, X, ChevronDown, ChevronRight } from "lucide-react";
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen, setIsOpen, toggleSidebar }) => {
   const location = useLocation();
-  const [isOpen, setIsOpen] = useState(true);
-  const [expandedMenus, setExpandedMenus] = useState({
+  const [expandedMenus, setExpandedMenus] = React.useState({
     report: false,
   });
-
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-  };
 
   const toggleMenu = (menu) => {
     setExpandedMenus((prev) => ({
@@ -63,14 +58,6 @@ const Sidebar = () => {
           onClick={toggleSidebar}
         ></div>
       )}
-
-      {/* Mobile sidebar toggle button */}
-      <button
-        className="fixed bottom-4 right-4 z-50 lg:hidden rounded-full bg-primary p-3 text-white shadow-lg"
-        onClick={toggleSidebar}
-      >
-        {isOpen ? <X size={24} /> : <Menu size={24} />}
-      </button>
 
       {/* Sidebar */}
       <aside
