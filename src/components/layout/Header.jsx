@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronDown, LogOut, User, Menu } from "lucide-react";
+import { ChevronDown, LogOut, User } from "lucide-react";
 import { deleteCookie } from "../../utils/cookieUtils";
 import { AUTH_CONFIG } from "../../config/env";
 
@@ -36,15 +36,7 @@ const Header = ({ toggleSidebar }) => {
   return (
     <header className="bg-white shadow-sm z-10">
       <div className="h-16 px-4 flex items-center justify-between">
-        <div className="flex items-center">
-          <button
-            onClick={toggleSidebar}
-            className="p-2 rounded-md hover:bg-gray-200 mr-2"
-          >
-            <Menu size={24} />
-          </button>
-          <div className="text-xl font-semibold">Dashboard</div>
-        </div>
+        <div className="text-xl font-semibold">Dashboard</div>
 
         <div className="flex items-center space-x-4">
           <div className="relative" ref={dropdownRef}>
