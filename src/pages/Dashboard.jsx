@@ -1,8 +1,9 @@
 
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { checkCookie, deleteCookie } from "../utils/cookieUtils";
+import { checkCookie } from "../utils/cookieUtils";
 import { AUTH_CONFIG } from "../config/env";
+import DashboardLayout from "../components/layout/DashboardLayout";
 
 const Dashboard = () => {
   const [userData, setUserData] = useState(null);
@@ -36,11 +37,6 @@ const Dashboard = () => {
     fetchData();
   }, [navigate, location]);
 
-  const handleLogout = () => {
-    deleteCookie(AUTH_CONFIG.AUTH_COOKIE_NAME);
-    navigate("/auth/login");
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
@@ -50,39 +46,47 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div className="flex items-center">
-            <div className="bg-black rounded-full p-2 mr-2">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2L19 7V17L12 22L5 17V7L12 2Z" fill="white" />
-              </svg>
-            </div>
-            <span className="text-2xl font-bold">twid</span>
-            <sup className="text-xs">™</sup>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
-          >
-            Logout
-          </button>
-        </div>
-      </header>
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <DashboardLayout>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white shadow rounded-lg p-6">
-          <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-          <p className="mb-4">Welcome to your dashboard!</p>
-          {userData && (
-            <div className="bg-gray-50 p-4 rounded-md">
-              <p><strong>Name:</strong> {userData.name}</p>
-              <p><strong>Email:</strong> {userData.email}</p>
-            </div>
-          )}
+          <h2 className="text-xl font-semibold mb-4">Transactions Aggregated</h2>
+          <div className="mb-4 flex space-x-2">
+            <button className="px-3 py-1 bg-gray-100 rounded-md">12 months</button>
+            <button className="px-3 py-1 bg-gray-100 rounded-md">30 days</button>
+            <button className="px-3 py-1 bg-primary text-white rounded-md">7 days</button>
+          </div>
+          <div className="h-64 bg-gray-50 rounded-md flex items-center justify-center">
+            <p className="text-gray-500">Transaction chart will appear here</p>
+          </div>
         </div>
-      </main>
-    </div>
+
+        <div className="bg-white shadow rounded-lg p-6">
+          <h2 className="text-xl font-semibold mb-4">Users Aggregated</h2>
+          <div className="mb-4 flex space-x-2">
+            <button className="px-3 py-1 bg-gray-100 rounded-md">12 months</button>
+            <button className="px-3 py-1 bg-gray-100 rounded-md">30 days</button>
+            <button className="px-3 py-1 bg-primary text-white rounded-md">7 days</button>
+          </div>
+          <div className="h-64 bg-gray-50 rounded-md flex items-center justify-center">
+            <p className="text-gray-500">Users chart will appear here</p>
+          </div>
+        </div>
+
+        <div className="bg-white shadow rounded-lg p-6">
+          <h2 className="text-xl font-semibold mb-4">First Time Users</h2>
+          <div className="h-64 bg-gray-50 rounded-md flex items-center justify-center">
+            <p className="text-gray-500">First time users data will appear here</p>
+          </div>
+        </div>
+
+        <div className="bg-white shadow rounded-lg p-6">
+          <h2 className="text-xl font-semibold mb-4">Repeat Users</h2>
+          <div className="h-64 bg-gray-50 rounded-md flex items-center justify-center">
+            <p className="text-gray-500">Repeat users data will appear here</p>
+          </div>
+        </div>
+      </div>
+    </DashboardLayout>
   );
 };
 
