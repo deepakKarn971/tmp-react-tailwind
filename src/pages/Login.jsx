@@ -24,12 +24,19 @@ const Login = () => {
     setError("");
     setIsLoading(true);
 
+    // Log the login attempt for debugging
+    console.info("Login attempt with:", { email, password });
+
     try {
-      // API call to the login endpoint
+      // API call to the login endpoint with mode: 'cors' and additional headers
       const response = await fetch("https://merchant-cug.twidpay.com/dashboard/auth-dashboard/v1/", {
         method: "POST",
+        mode: "cors", // Enable CORS
+        credentials: "include", // Include cookies in the request
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Access-Control-Allow-Origin": "*",
         },
         body: JSON.stringify({ email, password }),
       });
