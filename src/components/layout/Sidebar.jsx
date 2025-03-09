@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Layers, FileReport, CreditCard, RefreshCcw, ChevronDown, ChevronRight, Menu, X } from "lucide-react";
+import { LayoutDashboard, Layers, FileText, CreditCard, RefreshCcw, ChevronDown, ChevronRight, Menu, X } from "lucide-react";
 
 const Sidebar = () => {
   const location = useLocation();
@@ -38,7 +38,7 @@ const Sidebar = () => {
     },
     {
       title: "Report",
-      icon: <FileReport size={20} />,
+      icon: <FileText size={20} />,
       hasSubmenu: true,
       menu: "report",
       subItems: [
