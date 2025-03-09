@@ -1,8 +1,9 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, LogIn } from "lucide-react";
 import { setCookie, checkCookie } from "../utils/cookieUtils";
+import { loginApi } from "../utils/api";
+import { AUTH_CONFIG } from "../config/env";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -14,7 +15,7 @@ const Login = () => {
 
   useEffect(() => {
     // Check if token exists, redirect to dashboard if it does
-    if (checkCookie("auth_token")) {
+    if (checkCookie(AUTH_CONFIG.AUTH_COOKIE_NAME)) {
       navigate("/dashboard");
     }
   }, [navigate]);
@@ -28,27 +29,11 @@ const Login = () => {
     console.info("Login attempt with:", { email, password });
 
     try {
-      // API call to the login endpoint with mode: 'cors' and additional headers
-      const response = await fetch("https://merchant-cug.twidpay.com/dashboard/auth-dashboard/v1/", {
-        method: "POST",
-        mode: "cors", // Enable CORS
-        credentials: "include", // Include cookies in the request
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-          "Access-Control-Allow-Origin": "*",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Login failed");
-      }
+      // Call the login API using our utility function
+      const data = await loginApi(email, password);
 
       // Set the token in a cookie with an expiry of 1 day
-      setCookie("auth_token", data.token, 1);
+      setCookie(AUTH_CONFIG.AUTH_COOKIE_NAME, data.token, AUTH_CONFIG.TOKEN_EXPIRY_DAYS);
       
       // Redirect to dashboard
       navigate("/dashboard");
