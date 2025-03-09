@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Components, FileReport, CreditCard, RefreshCcw, ChevronDown, ChevronRight, Menu, X } from "lucide-react";
+import { LayoutDashboard, Layers, FileReport, CreditCard, RefreshCcw, ChevronDown, ChevronRight, Menu, X } from "lucide-react";
 
 const Sidebar = () => {
   const location = useLocation();
@@ -33,7 +33,7 @@ const Sidebar = () => {
     },
     {
       title: "Components",
-      icon: <Components size={20} />,
+      icon: <Layers size={20} />,
       path: "/dashboard/components",
     },
     {
