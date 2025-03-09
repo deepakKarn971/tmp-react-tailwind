@@ -55,11 +55,10 @@ export const fetchApi = async (endpoint, options = {}) => {
  * @returns {Promise<Object>} - Response with token and user data
  */
 export const loginApi = (email, password) => {
-  return fetchApi("/dashboard/auth-dashboard/v1/", {
+  return fetchApi("/dashboard/auth-dashboard/v1/login", {
     method: "POST",
     body: JSON.stringify({ email, password })
   });
 };
 
 // Add more API functions as needed
-
