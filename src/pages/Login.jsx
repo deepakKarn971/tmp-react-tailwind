@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Eye, EyeOff, LogIn } from "lucide-react";
@@ -29,7 +28,7 @@ const Login = () => {
           </div>
         </div>
 
-        <h2 className="text-xl font-semibold text-center mb-6 text-primary">SIGN IN</h2>
+        <h2 className="text-xl font-semibold text-left mb-6 text-primary">SIGN IN</h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
