@@ -92,3 +92,15 @@ export const fetchDashboardData = (params = {}) => {
   const queryString = new URLSearchParams(params).toString();
   return fetchApi(`/dashboard/analytics/v1/dashboard?${queryString}`);
 };
+
+/**
+ * Fetch data points for dashboard metrics
+ * @param {Object} payload - Data containing range, fromDate, toDate
+ * @returns {Promise<Object>} - Data points analytics
+ */
+export const fetchDataPoints = (payload) => {
+  return fetchApi("/dashboard/merchant-dashboard/v1/analytics/data-points", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+};

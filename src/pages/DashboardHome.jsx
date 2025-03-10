@@ -1,7 +1,7 @@
 
-import React, { useState } from "react";
-import { Calendar, ChevronDown, ArrowUp, Search } from "lucide-react";
-import { format } from "date-fns";
+import React, { useState, useEffect } from "react";
+import { Calendar, ChevronDown, Search } from "lucide-react";
+import { format, parse, startOfDay, endOfDay, subDays } from "date-fns";
 import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
 import { Calendar as CalendarComponent } from "../components/ui/calendar";
 import { cn } from "../lib/utils";
@@ -11,6 +11,51 @@ const DashboardHome = () => {
   const [dateRange, setDateRange] = useState("Last 30 Days");
   const [isDateDropdownOpen, setIsDateDropdownOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [fromDate, setFromDate] = useState(null);
+  const [toDate, setToDate] = useState(null);
+  
+  // State to track different time ranges for different metrics
+  const [timeRanges, setTimeRanges] = useState({
+    dataPoints: "last30days",
+    transactions: "last7days",
+    users: "last7days",
+    firstTimeUsers: "last7days",
+    repeatUsers: "last7days",
+  });
+
+  // Set date range based on selection
+  useEffect(() => {
+    let from = null;
+    let to = null;
+    
+    switch(dateRange) {
+      case "Last 7 Days":
+        from = startOfDay(subDays(new Date(), 7));
+        to = endOfDay(new Date());
+        setTimeRanges(prev => ({ ...prev, dataPoints: "last7days" }));
+        break;
+      case "Last 30 Days":
+        from = startOfDay(subDays(new Date(), 30));
+        to = endOfDay(new Date());
+        setTimeRanges(prev => ({ ...prev, dataPoints: "last30days" }));
+        break;
+      case "yesterday":
+        from = startOfDay(subDays(new Date(), 1));
+        to = endOfDay(subDays(new Date(), 1));
+        setTimeRanges(prev => ({ ...prev, dataPoints: "yesterday" }));
+        break;
+      default:
+        // If custom date is selected
+        if (selectedDate) {
+          from = startOfDay(selectedDate);
+          to = endOfDay(selectedDate);
+          setTimeRanges(prev => ({ ...prev, dataPoints: "custom" }));
+        }
+    }
+    
+    setFromDate(from);
+    setToDate(to);
+  }, [dateRange, selectedDate]);
 
   const handleDateRangeChange = (range) => {
     setDateRange(range);
@@ -22,6 +67,15 @@ const DashboardHome = () => {
     "Last 7 Days",
     "yesterday"
   ];
+
+  const handleSearch = () => {
+    console.log("Search with params:", {
+      dateRange,
+      fromDate,
+      toDate,
+      timeRanges
+    });
+  };
 
   return (
     <div className="p-6 md:p-8">
@@ -73,7 +127,10 @@ const DashboardHome = () => {
               <CalendarComponent
                 mode="single"
                 selected={selectedDate}
-                onSelect={setSelectedDate}
+                onSelect={(date) => {
+                  setSelectedDate(date);
+                  setDateRange("Custom Date");
+                }}
                 initialFocus
                 className={cn("p-3 pointer-events-auto")}
               />
@@ -81,7 +138,10 @@ const DashboardHome = () => {
           </Popover>
 
           {/* Search Button */}
-          <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-8 rounded-md transition-colors">
+          <button 
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-8 rounded-md transition-colors"
+            onClick={handleSearch}
+          >
             SEARCH
           </button>
         </div>
@@ -90,12 +150,30 @@ const DashboardHome = () => {
       {/* Dashboard Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <SuccessRateCard 
-          rate="28.35"
-          change="7.02"
-          isPositive={true}
-          period="last month"
+          title="Success Rate"
+          timeRange={timeRanges.dataPoints}
+          fromDate={fromDate}
+          toDate={toDate}
+          valueKey="successRate"
         />
-        {/* Additional cards would go here */}
+        
+        <SuccessRateCard 
+          title="Conversion Rate"
+          timeRange={timeRanges.dataPoints}
+          fromDate={fromDate}
+          toDate={toDate}
+          valueKey="conversionRate"
+        />
+        
+        <SuccessRateCard 
+          title="Average Order Value"
+          timeRange={timeRanges.dataPoints}
+          fromDate={fromDate}
+          toDate={toDate}
+          valueKey="averageOrderValue"
+        />
+        
+        {/* You can add more cards as needed */}
       </div>
     </div>
   );
