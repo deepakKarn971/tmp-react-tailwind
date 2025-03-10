@@ -5,6 +5,8 @@
 
 // Base URL for API requests
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://merchant-cug.twidpay.com";
+import { getCookie, checkCookie } from "./cookieUtils";
+import { AUTH_CONFIG } from "../config/env";
 
 /**
  * Makes a fetch request with common headers and error handling
@@ -16,11 +18,15 @@ export const fetchApi = async (endpoint, options = {}) => {
   try {
     const url = `${API_BASE_URL}${endpoint}`;
     
+    // Get auth token from cookie if available
+    const auth_token = checkCookie(AUTH_CONFIG.AUTH_COOKIE_NAME) ? getCookie(AUTH_CONFIG.AUTH_COOKIE_NAME) : null;
+    
     // Default headers
     const headers = {
       "Content-Type": "application/json",
       "Accept": "application/json",
       "Access-Control-Allow-Origin": "*",
+      ...(auth_token && { Authorization: `Bearer ${auth_token}` }),
       ...(options.headers || {})
     };
 
