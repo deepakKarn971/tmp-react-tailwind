@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronDown, LogOut, User, Menu } from "lucide-react";
@@ -49,25 +50,26 @@ const Header = ({ toggleSidebar }) => {
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={toggleDropdown}
-              className="flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 rounded px-3 py-2 transition-colors duration-200"
+              className="flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 rounded-full py-2 px-4 transition-colors duration-200"
             >
-              <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-600">
+              <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600">
                 <User size={18} />
               </div>
-              <span className="font-medium">deepak karn</span>
-              <ChevronDown size={16} className={`transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+              <span className="font-medium text-gray-600">deepak karn</span>
+              <div className="bg-gray-200 rounded-full p-1">
+                <ChevronDown size={16} className={`transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+              </div>
             </button>
 
             {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-full min-w-[192px] bg-white rounded shadow-lg py-1 z-50">
-                <div className="px-4 py-3 border-b border-gray-100">
-                  <p className="text-sm font-semibold">Account Actions</p>
+              <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg py-1 z-50">
+                <div className="px-6 py-4 border-b border-gray-100">
+                  <p className="text-lg font-semibold text-center">Account Actions</p>
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  className="flex items-center justify-center w-full px-6 py-4 text-xl font-medium text-gray-700 hover:bg-gray-100"
                 >
-                  <LogOut size={16} className="mr-2" />
                   Logout
                 </button>
               </div>
