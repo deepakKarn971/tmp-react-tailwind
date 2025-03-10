@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
 import { TrendingUp, Calendar as CalendarIcon, ChevronDown, X } from "lucide-react";
 import { format, isAfter, isBefore, isEqual, addDays, subDays } from "date-fns";
 import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
 import { Calendar } from "../components/ui/calendar";
 import { Button } from "../components/ui/button";
 import { cn, formatDateRange } from "../lib/utils";
-import { fetchAnalyticsData } from "../utils/api";
+import { fetchAnalyticsData, processAnalyticsResponse } from "../utils/api";
 
 const Dashboard = () => {
   const [transactionTimeframe, setTransactionTimeframe] = useState("7days");
@@ -22,8 +22,18 @@ const Dashboard = () => {
   
   const [transactionData, setTransactionData] = useState([]);
   const [userData, setUserData] = useState([]);
+  const [successRateData, setSuccessRateData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const formatSuccessRateData = (dataArray) => {
+    if (!dataArray) return [];
+    
+    return dataArray.map((value, index) => ({
+      day: index + 1,
+      value: value
+    }));
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,6 +41,16 @@ const Dashboard = () => {
       setError(null);
       
       try {
+        const analyticsResult = await fetchAnalyticsData(
+          "overview", 
+          transactionTimeframe, 
+          dateRange.from, 
+          dateRange.to
+        );
+        
+        const processedData = processAnalyticsResponse(analyticsResult);
+        setSuccessRateData(processedData.successRate);
+        
         const transactionResult = await fetchAnalyticsData(
           "transactions", 
           transactionTimeframe, 
@@ -52,6 +72,16 @@ const Dashboard = () => {
         
         setTransactionData(getMockTransactionData(transactionTimeframe));
         setUserData(getMockUserData(usersTimeframe));
+        
+        setSuccessRateData({
+          title: "Success Rate",
+          value: 28.35,
+          valuePrefix: "",
+          valueSuffix: "%",
+          percentageGrowth: "7.02%",
+          comparisionRange: "last month",
+          dataArray: [28.28, 27.62, 30.20, 28.53, 28.91, 28.28, 26.88, 26.74, 27.37, 29.74]
+        });
       } finally {
         setIsLoading(false);
       }
@@ -59,7 +89,7 @@ const Dashboard = () => {
     
     fetchData();
   }, [transactionTimeframe, usersTimeframe, dateRange.from, dateRange.to]);
-  
+
   useEffect(() => {
     if (selectedDateFilter === "Last 30 Days") {
       setDateRange({
@@ -315,32 +345,39 @@ const Dashboard = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-lg font-semibold mb-4">Success Rate</h2>
+          <h2 className="text-lg font-semibold mb-4">
+            {successRateData?.title || "Success Rate"}
+          </h2>
           <div className="flex items-end gap-2">
-            <div className="text-4xl font-bold">28.35<span className="text-2xl">%</span></div>
+            <div className="text-4xl font-bold">
+              {successRateData?.valuePrefix || ""}
+              {successRateData?.value || 0}
+              <span className="text-2xl">{successRateData?.valueSuffix || "%"}</span>
+            </div>
           </div>
           <div className="flex items-center text-green-500 mt-2">
             <TrendingUp size={16} className="mr-1" />
-            <span className="font-medium">7.02%</span>
-            <span className="text-gray-600 ml-1">last month</span>
+            <span className="font-medium">{successRateData?.percentageGrowth || "0%"}</span>
+            <span className="text-gray-600 ml-1">{successRateData?.comparisionRange || "last month"}</span>
           </div>
           <div className="mt-4 h-20">
-            <ResponsiveContainer width="100%" height="100%">
-              <svg viewBox="0 0 500 100" width="100%" height="100%">
-                <path
-                  d="M0,50 C50,30 100,70 150,50 C200,30 250,60 300,40 C350,20 400,80 450,10 C480,90 500,50 500,50"
-                  fill="none"
-                  stroke="#f87171"
-                  strokeWidth="2"
-                />
-                <path
-                  d="M0,50 C50,30 100,70 150,50 C200,30 250,60 300,40 C350,20 400,80 450,10 C480,90 500,50 500,50"
-                  fill="rgba(248, 113, 113, 0.1)"
-                  strokeWidth="0"
-                  d="M0,100 L0,50 C50,30 100,70 150,50 C200,30 250,60 300,40 C350,20 400,80 450,10 C480,90 500,50 500,50 L500,100 Z"
-                />
-              </svg>
-            </ResponsiveContainer>
+            {successRateData?.dataArray && (
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={formatSuccessRateData(successRateData.dataArray)}
+                  margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
+                >
+                  <Line
+                    type="monotone"
+                    dataKey="value"
+                    stroke="#f87171"
+                    strokeWidth={2}
+                    dot={false}
+                    isAnimationActive={true}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
       </div>

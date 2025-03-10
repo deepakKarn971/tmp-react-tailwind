@@ -88,4 +88,34 @@ export const fetchAnalyticsData = (graphType, range, fromDate, toDate) => {
   return fetchApi(`/dashboardmerchant-dashboard/v1/analytics/aggregated?${params.toString()}`);
 };
 
+/**
+ * Process the analytics API response to extract graph data
+ * @param {Object} response - The API response object
+ * @returns {Object} - Processed data for dashboard display
+ */
+export const processAnalyticsResponse = (response) => {
+  if (!response || !response.data) {
+    return {
+      successRate: null,
+      transactionData: [],
+      userData: []
+    };
+  }
+
+  const data = response.data;
+  
+  // Find the success rate data (index 2 in the provided example)
+  const successRateData = data.find(item => item && item.title === "Success Rate") || null;
+  
+  // Process other data arrays as needed for transactions and users
+  // For now, we'll return placeholders, but you can expand this as needed
+  
+  return {
+    successRate: successRateData,
+    // Add other processed data as needed
+    transactionData: [],
+    userData: []
+  };
+};
+
 // Add more API functions as needed
