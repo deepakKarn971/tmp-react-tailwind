@@ -15,6 +15,20 @@ const Breadcrumbs = () => {
       reports: "Reports",
       "transaction-report": "Transaction Report",
       "refund-report": "Refund Report",
+      income: "Income",
+      audience: "Audience",
+      settings: "Settings",
+      earnings: "Earnings",
+      refunds: "Refunds",
+      declines: "Declines",
+      payouts: "Payouts",
+      overview: "Overview",
+      demographics: "Demographics",
+      account: "Account",
+      security: "Security",
+      posts: "Posts",
+      schedules: "Schedules",
+      notification: "Notification"
     };
     return pathMap[path] || path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, " ");
   };
@@ -24,6 +38,14 @@ const Breadcrumbs = () => {
     const relationships = {
       "transaction-report": "reports",
       "refund-report": "reports",
+      "earnings": "income",
+      "refunds": "income",
+      "declines": "income",
+      "payouts": "income",
+      "overview": "audience",
+      "demographics": "audience",
+      "account": "settings",
+      "security": "settings"
     };
     return relationships[path];
   };
@@ -45,7 +67,7 @@ const Breadcrumbs = () => {
         const parentFullPath = currentPath ? `${currentPath}/${parentPath}` : `/${parentPath}`;
         items.push({
           name: getReadableName(parentPath),
-          path: parentFullPath,
+          path: `/dashboard/${parentPath}`,
           isLast: false
         });
       }
@@ -54,7 +76,7 @@ const Breadcrumbs = () => {
       currentPath = currentPath ? `${currentPath}/${path}` : `/${path}`;
       items.push({
         name: getReadableName(path),
-        path: currentPath,
+        path: i === 0 ? `/dashboard` : currentPath.startsWith('/') ? currentPath : `/${currentPath}`,
         isLast: i === pathnames.length - 1
       });
     }

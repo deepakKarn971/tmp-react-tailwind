@@ -3,20 +3,30 @@ import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { 
   LayoutDashboard, 
-  FileText, 
+  FileText,
   ChevronRight,
   ChevronLeft,
-  ChevronDown
+  ChevronDown,
+  BarChart2,
+  CircleDot
 } from "lucide-react";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const location = useLocation();
   const [expandedMenus, setExpandedMenus] = useState({
-    report: false
+    report: location.pathname.includes("/dashboard/reports")
   });
 
   const isActive = (path) => {
     return location.pathname === path;
+  };
+
+  const isSubmenuActive = (parentKey) => {
+    const paths = {
+      report: ["/dashboard/reports/transaction-report", "/dashboard/reports/refund-report"]
+    };
+    
+    return paths[parentKey] && paths[parentKey].some(path => location.pathname === path);
   };
 
   const toggleSubmenu = (menuKey) => {
@@ -39,17 +49,17 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     },
     {
       title: "Report",
-      icon: <FileText size={20} />,
+      icon: <BarChart2 size={20} />,
       key: "report",
       hasSubmenu: true,
       submenuItems: [
         {
           title: "Transaction Report",
-          path: "/dashboard/posts",
+          path: "/dashboard/reports/transaction-report",
         },
         {
           title: "Refund Report",
-          path: "/dashboard/posts",
+          path: "/dashboard/reports/refund-report",
         }
       ]
     },
@@ -72,13 +82,13 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       <Link
         key={index}
         to={item.path}
-        className={`flex items-center pl-9 py-2 text-sm rounded-lg ${
+        className={`flex items-center pl-12 py-2.5 text-sm rounded-lg ${
           isActive(item.path) 
             ? "text-primary font-medium" 
             : "text-gray-600 hover:bg-gray-100"
         }`}
       >
-        <span className="w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
+        <CircleDot className="w-4 h-4 mr-2 text-gray-400" />
         <span>{item.title}</span>
       </Link>
     ));
@@ -91,11 +101,11 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         <SidebarToggleButton />
         
         {menuItems.map((item, index) => (
-          <div key={index} className="mb-2">
+          <div key={index} className="mb-2 w-full px-2">
             {item.hasSubmenu ? (
               <button
-                className={`p-3 rounded-lg ${
-                  expandedMenus[item.key] ? "bg-gray-100" : ""
+                className={`p-3 rounded-lg w-full flex justify-center ${
+                  expandedMenus[item.key] || isSubmenuActive(item.key) ? "bg-gray-100" : ""
                 } text-gray-500 hover:bg-gray-100`}
                 onClick={() => toggleSubmenu(item.key)}
                 aria-label={item.title}
@@ -105,7 +115,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             ) : (
               <Link
                 to={item.path}
-                className={`p-3 rounded-lg ${
+                className={`p-3 rounded-lg w-full flex justify-center ${
                   isActive(item.path) ? "bg-primary text-white" : "text-gray-500 hover:bg-gray-100"
                 }`}
                 aria-label={item.title}
@@ -132,7 +142,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 <button
                   onClick={() => toggleSubmenu(item.key)}
                   className={`flex items-center w-full px-3 py-2.5 rounded-lg ${
-                    expandedMenus[item.key] ? "bg-gray-100" : ""
+                    expandedMenus[item.key] || isSubmenuActive(item.key) ? "bg-gray-100" : ""
                   } text-gray-700 hover:bg-gray-100`}
                 >
                   <span className="mr-3 text-gray-500">{item.icon}</span>
@@ -146,7 +156,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                   </span>
                 </button>
                 {expandedMenus[item.key] && (
-                  <div className="mt-1 ml-2">
+                  <div className="mt-1">
                     {renderSubmenuItems(item.submenuItems)}
                   </div>
                 )}

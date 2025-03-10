@@ -8,6 +8,8 @@ import DashboardLayout from "./components/layout/DashboardLayout";
 
 // Placeholder components for dashboard routes
 const Components = () => <div className="p-8"><h1 className="text-2xl font-bold">Components Page</h1></div>;
+const TransactionReport = () => <div className="p-8"><h1 className="text-2xl font-bold">Transaction Report Page</h1></div>;
+const RefundReport = () => <div className="p-8"><h1 className="text-2xl font-bold">Refund Report Page</h1></div>;
 const AudienceOverview = () => <div className="p-8"><h1 className="text-2xl font-bold">Audience Overview</h1></div>;
 const AudienceDemographics = () => <div className="p-8"><h1 className="text-2xl font-bold">Audience Demographics</h1></div>;
 const Posts = () => <div className="p-8"><h1 className="text-2xl font-bold">Posts Page</h1></div>;
@@ -31,6 +33,10 @@ const App = () => (
       <Route path="/dashboard" element={<DashboardLayout />}>
         <Route index element={<Dashboard />} />
         <Route path="components" element={<Components />} />
+        
+        {/* Report routes */}
+        <Route path="reports/transaction-report" element={<TransactionReport />} />
+        <Route path="reports/refund-report" element={<RefundReport />} />
         
         {/* Audience routes */}
         <Route path="audience/overview" element={<AudienceOverview />} />
@@ -56,8 +62,8 @@ const App = () => (
         <Route path="settings/security" element={<SecuritySettings />} />
         
         {/* Keep backwards compatibility for existing direct routes */}
-        <Route path="transaction-report" element={<Navigate to="/dashboard/income/earnings" replace />} />
-        <Route path="refund-report" element={<Navigate to="/dashboard/income/refunds" replace />} />
+        <Route path="transaction-report" element={<Navigate to="/dashboard/reports/transaction-report" replace />} />
+        <Route path="refund-report" element={<Navigate to="/dashboard/reports/refund-report" replace />} />
       </Route>
       
       {/* Redirect from root to login page */}
