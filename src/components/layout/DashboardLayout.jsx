@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
@@ -19,14 +18,15 @@ const DashboardLayout = () => {
   };
 
   // Check if current path is dashboard (to hide breadcrumbs)
-  const isDashboardPath = location.pathname === "/dashboard" || location.pathname === "/dashboard/";
+  const isDashboardPath =
+    location.pathname === "/dashboard" || location.pathname === "/dashboard/";
 
   useEffect(() => {
     // Check if user is authenticated
     if (!checkCookie(AUTH_CONFIG.AUTH_COOKIE_NAME)) {
       setCookie(
         AUTH_CONFIG.AUTH_COOKIE_NAME,
-        "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJpc3MiOiJodHRwczovL21lcmNoYW50LWN1Zy50d2lkcGF5LmNvbS9kYXNoYm9hcmQvYXV0aC1kYXNoYm9hcmQvdjEvbG9naW4iLCJpYXQiOjE3NDE1ODUxMDIsImV4cCI6MTc0MTU4ODcwMiwibmJmIjoxNzQxNTg1MTAyLCJqdGkiOiJLWXNrZTlHcUtPMlduekVuIiwic3ViIjoiNzM2IiwicHJ2IjoiOWM5MzNhNzkwODYyZTFhNWRiZWMyMzdjZGM1OTJhNWEzZTE2OTYzOCJ9.gD62gRElaByoOp-PuXc1PlSgtDU5cBJdkWCO8hPD7kyECtIPfAgo-AS1x0FaW1K41wWd7hPhkUH9wXErnlcelaiIBl-_J-4sZm3-w2IdQEPlZDbQgjcp0hpJ3Ng6iNnDBxujV3cwgrvT-IXGy1UqM6fc8SUI5zHxcXOYwihf4siDYCPTYJGNpIfM9HLIfi_DV4bnQ6u-vBfXdD_JxqPltMH63bJ2UXX7GtpyAObSSCikGyP9lhQ218Pu_pZo_0lq_5irGHstDrvcUj_3UuztszEg81Lb9cNl6FoP5LRMMk0kEyIPzqS3rCWjYmFoFWOrODNqBFLiSlo9IzS1ziauxVFV6H7k9_1203yfBlFRkmZbXz-omwgicKGhJO0rIpZhx_lxFueob57f3i_j5YpNpY-OXn3MswL8XWS9-VbN5FNTj3p6fNQgoi_5BQRPVGwgUXEpfhZJQ0Z7sMmyE2h-3wmmImQ5vkcvvEpSi3G3lXui9iT3d3avX1pOY0A4kk4zL3juaqZg41De-OBD-kSoEAe0rUwMcX2DJdI6AO8J-8yZADuYVKKzLmxZbgzPASKPQy0mg4k1f_AvHOFeOr-kb9JOnsxkOc5cHULxqrmo4rXbsygg0Q2-FsUnvdljeuivATwZk7WnA-cpPNKpssVGREy8KV0WIzU9BzdhkSO3jtQ",
+        window.tokenTmp,
         AUTH_CONFIG.TOKEN_EXPIRY_DAYS
       );
     }
@@ -61,9 +61,7 @@ const DashboardLayout = () => {
       <Header toggleSidebar={toggleSidebar} />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-        <main
-          className="flex-1 overflow-y-auto transition-all duration-300"
-        >
+        <main className="flex-1 overflow-y-auto transition-all duration-300">
           {/* Only show breadcrumbs if not on the Dashboard page */}
           {!isDashboardPath && <Breadcrumbs />}
           <Outlet /> {/* This renders the child route components */}

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff, LogIn } from "lucide-react";
@@ -36,8 +35,13 @@ const Login = () => {
       const data = await loginApi(email, password);
 
       // Set the token in a cookie with an expiry of 1 day
-      setCookie(AUTH_CONFIG.AUTH_COOKIE_NAME, data.token, AUTH_CONFIG.TOKEN_EXPIRY_DAYS);
-      
+      // setCookie(
+      //   AUTH_CONFIG.AUTH_COOKIE_NAME,
+      //   data.token,
+      //   AUTH_CONFIG.TOKEN_EXPIRY_DAYS
+      // );
+      window.tokenTmp = data.token;
+
       // Redirect to dashboard
       navigate("/dashboard");
     } catch (err) {
@@ -53,7 +57,13 @@ const Login = () => {
         <div className="flex justify-center mb-8">
           <div className="flex items-center">
             <div className="bg-black rounded-full p-2 mr-2">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
                 <path d="M12 2L19 7V17L12 22L5 17V7L12 2Z" fill="white" />
               </svg>
             </div>
@@ -62,7 +72,9 @@ const Login = () => {
           </div>
         </div>
 
-        <h2 className="text-xl font-semibold text-left mb-6 text-primary">SIGN IN</h2>
+        <h2 className="text-xl font-semibold text-left mb-6 text-primary">
+          SIGN IN
+        </h2>
 
         {error && (
           <div className="mb-4 p-2 bg-red-50 text-red-600 rounded border border-red-200">
@@ -72,7 +84,10 @@ const Login = () => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Email*
             </label>
             <input
@@ -88,7 +103,10 @@ const Login = () => {
 
           <div className="relative">
             <div className="flex justify-between mb-1">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Password*
               </label>
               <Link to="/auth/forgot-password" className="text-sm text-primary">
