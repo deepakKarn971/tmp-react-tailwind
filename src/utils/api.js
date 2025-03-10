@@ -81,26 +81,3 @@ export const loginApi = (email, password) => {
     body: JSON.stringify({ email, password }),
   });
 };
-
-/**
- * Fetch analytics data for dashboard graphs using POST request
- * @param {string} graphType - Type of graph (transactions, users, etc.)
- * @param {string} range - Range period (7days, 30days, 12months)
- * @param {Date} fromDate - Start date for the range
- * @param {Date} toDate - End date for the range
- * @returns {Promise<Object>} - Graph data and options
- */
-export const fetchAnalyticsData = (graphType, range, fromDate, toDate) => {
-  return fetchApi(
-    `/dashboard/merchant-dashboard/v1/analytics/aggregated?graphType=${graphType}`,
-    {
-      method: "POST",
-      body: JSON.stringify({
-        range: range || "last7days",
-        fromDate: fromDate ? fromDate.toISOString() : null,
-        toDate: toDate ? toDate.toISOString() : null,
-        graphType: graphType,
-      }),
-    }
-  );
-};
