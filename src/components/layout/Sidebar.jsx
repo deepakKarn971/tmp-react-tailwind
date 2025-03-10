@@ -1,23 +1,29 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { 
   LayoutDashboard, 
-  Users, 
   FileText, 
-  Calendar, 
-  DollarSign, 
-  Bell, 
-  Settings,
   ChevronRight,
-  ChevronLeft
+  ChevronLeft,
+  ChevronDown
 } from "lucide-react";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const location = useLocation();
+  const [expandedMenus, setExpandedMenus] = useState({
+    report: false
+  });
 
   const isActive = (path) => {
     return location.pathname === path;
+  };
+
+  const toggleSubmenu = (menuKey) => {
+    setExpandedMenus(prev => ({
+      ...prev,
+      [menuKey]: !prev[menuKey]
+    }));
   };
 
   const menuItems = [
@@ -33,9 +39,19 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     },
     {
       title: "Report",
-      icon: <Calendar size={20} />,
-      path: "/dashboard/posts",
+      icon: <FileText size={20} />,
+      key: "report",
       hasSubmenu: true,
+      submenuItems: [
+        {
+          title: "Transaction Report",
+          path: "/dashboard/posts",
+        },
+        {
+          title: "Refund Report",
+          path: "/dashboard/posts",
+        }
+      ]
     },
   ];
 
@@ -50,6 +66,24 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     </button>
   );
 
+  // Render submenu items
+  const renderSubmenuItems = (items) => {
+    return items.map((item, index) => (
+      <Link
+        key={index}
+        to={item.path}
+        className={`flex items-center pl-9 py-2 text-sm rounded-lg ${
+          isActive(item.path) 
+            ? "text-primary font-medium" 
+            : "text-gray-600 hover:bg-gray-100"
+        }`}
+      >
+        <span className="w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
+        <span>{item.title}</span>
+      </Link>
+    ));
+  };
+
   // Collapsed sidebar view
   if (!isOpen) {
     return (
@@ -57,16 +91,29 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         <SidebarToggleButton />
         
         {menuItems.map((item, index) => (
-          <Link
-            key={index}
-            to={item.path}
-            className={`p-3 rounded-lg mb-2 ${
-              isActive(item.path) ? "bg-primary text-white" : "text-gray-500 hover:bg-gray-100"
-            }`}
-            aria-label={item.title}
-          >
-            {item.icon}
-          </Link>
+          <div key={index} className="mb-2">
+            {item.hasSubmenu ? (
+              <button
+                className={`p-3 rounded-lg ${
+                  expandedMenus[item.key] ? "bg-gray-100" : ""
+                } text-gray-500 hover:bg-gray-100`}
+                onClick={() => toggleSubmenu(item.key)}
+                aria-label={item.title}
+              >
+                {item.icon}
+              </button>
+            ) : (
+              <Link
+                to={item.path}
+                className={`p-3 rounded-lg ${
+                  isActive(item.path) ? "bg-primary text-white" : "text-gray-500 hover:bg-gray-100"
+                }`}
+                aria-label={item.title}
+              >
+                {item.icon}
+              </Link>
+            )}
+          </div>
         ))}
       </div>
     );
@@ -79,23 +126,47 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       
       <div className="py-6 px-4">
         {menuItems.map((item, index) => (
-          <Link
-            key={index}
-            to={item.path}
-            className={`flex items-center px-3 py-2.5 rounded-lg mb-2 ${
-              isActive(item.path) 
-                ? "bg-primary text-white font-medium" 
-                : "text-gray-700 hover:bg-gray-100"
-            }`}
-          >
-            <span className={`mr-3 ${isActive(item.path) ? "text-white" : "text-gray-500"}`}>
-              {item.icon}
-            </span>
-            <span>{item.title}</span>
-            {item.hasSubmenu && (
-              <ChevronRight size={16} className="ml-auto" />
+          <div key={index} className="mb-2">
+            {item.hasSubmenu ? (
+              <div>
+                <button
+                  onClick={() => toggleSubmenu(item.key)}
+                  className={`flex items-center w-full px-3 py-2.5 rounded-lg ${
+                    expandedMenus[item.key] ? "bg-gray-100" : ""
+                  } text-gray-700 hover:bg-gray-100`}
+                >
+                  <span className="mr-3 text-gray-500">{item.icon}</span>
+                  <span>{item.title}</span>
+                  <span className="ml-auto">
+                    {expandedMenus[item.key] ? (
+                      <ChevronDown size={16} />
+                    ) : (
+                      <ChevronRight size={16} />
+                    )}
+                  </span>
+                </button>
+                {expandedMenus[item.key] && (
+                  <div className="mt-1 ml-2">
+                    {renderSubmenuItems(item.submenuItems)}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                to={item.path}
+                className={`flex items-center px-3 py-2.5 rounded-lg ${
+                  isActive(item.path) 
+                    ? "bg-primary text-white font-medium" 
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                <span className={`mr-3 ${isActive(item.path) ? "text-white" : "text-gray-500"}`}>
+                  {item.icon}
+                </span>
+                <span>{item.title}</span>
+              </Link>
             )}
-          </Link>
+          </div>
         ))}
       </div>
     </aside>
