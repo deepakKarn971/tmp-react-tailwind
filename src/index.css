@@ -59,7 +59,7 @@
 
   /* Add default styling for input elements with rounded corners */
   input {
-    @apply rounded-md;
+    @apply rounded;
   }
 }
 
