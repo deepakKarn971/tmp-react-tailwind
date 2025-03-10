@@ -1,4 +1,3 @@
-
 /**
  * API utility functions for making HTTP requests
  */
@@ -24,8 +23,7 @@ export const fetchApi = async (endpoint, options = {}) => {
     // Default headers
     const headers = {
       "Content-Type": "application/json",
-      "Accept": "application/json",
-      "Access-Control-Allow-Origin": "*",
+      Accept: "application/json",
       ...(auth_token && { Authorization: `Bearer ${auth_token}` }),
       ...(options.headers || {})
     };
@@ -35,11 +33,11 @@ export const fetchApi = async (endpoint, options = {}) => {
       mode: "cors",
       credentials: "include",
       ...options,
-      headers
+      headers,
     };
 
-    console.info(`API Request: ${options.method || 'GET'} ${url}`);
-    
+    console.info(`API Request: ${options.method || "GET"} ${url}`);
+
     const response = await fetch(url, fetchOptions);
     const data = await response.json();
 
@@ -63,7 +61,7 @@ export const fetchApi = async (endpoint, options = {}) => {
 export const loginApi = (email, password) => {
   return fetchApi("/dashboard/auth-dashboard/v1/login", {
     method: "POST",
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({ email, password }),
   });
 };
 
@@ -76,26 +74,19 @@ export const loginApi = (email, password) => {
  * @returns {Promise<Object>} - Graph data and options
  */
 export const fetchAnalyticsData = (graphType, range, fromDate, toDate) => {
-  const payload = {
-    graphType: graphType
-  };
-  
-  if (range) {
-    payload.range = range;
-  }
-  
-  if (fromDate) {
-    payload.fromDate = fromDate.toISOString().split('T')[0];
-  }
-  
-  if (toDate) {
-    payload.toDate = toDate.toISOString().split('T')[0];
-  }
-  
-  return fetchApi("/dashboardmerchant-dashboard/v1/analytics/aggregated", {
-    method: "POST",
-    body: JSON.stringify(payload)
-  });
+  const params = new URLSearchParams();
+  return fetchApi(
+    `/dashboard/merchant-dashboard/v1/analytics/aggregated?graphType=${graphType}`,
+    {
+      method: "POST",
+      body: JSON.stringify({
+        range: "last7days",
+        fromDate: null,
+        toDate: null,
+        graphType: graphType,
+      }),
+    }
+  );
 };
 
 /**
@@ -107,41 +98,47 @@ export const processAnalyticsResponse = (response) => {
   if (!response || !response.data) {
     return {
       successRate: null,
-      transactionData: []
+      transactionData: [],
     };
   }
 
   const data = response.data;
-  
+
   // Check if data is an array of objects (success rate format)
-  if (data.some(item => item && typeof item === 'object' && item.title === "Success Rate")) {
-    const successRateData = data.find(item => item && item.title === "Success Rate") || null;
+  if (
+    data.some(
+      (item) =>
+        item && typeof item === "object" && item.title === "Success Rate"
+    )
+  ) {
+    const successRateData =
+      data.find((item) => item && item.title === "Success Rate") || null;
     return {
       successRate: successRateData,
-      transactionData: []
+      transactionData: [],
     };
   }
-  
+
   // Check if data is in the transaction format (array of arrays)
   if (Array.isArray(data) && data.length > 0 && Array.isArray(data[0])) {
     // Skip the header row (index 0)
-    const processedData = data.slice(1).map(item => {
+    const processedData = data.slice(1).map((item) => {
       return {
         name: item[0],
-        value: parseInt(item[1], 10)
+        value: parseInt(item[1], 10),
       };
     });
-    
+
     return {
       successRate: null,
-      transactionData: processedData
+      transactionData: processedData,
     };
   }
-  
+
   // Default return if data format doesn't match known patterns
   return {
     successRate: null,
-    transactionData: []
+    transactionData: [],
   };
 };
 

@@ -42,15 +42,15 @@ const Dashboard = () => {
       setError(null);
       
       try {
-        const analyticsResult = await fetchAnalyticsData(
-          "overview", 
-          transactionTimeframe, 
-          dateRange.from, 
-          dateRange.to
-        );
+        // const analyticsResult = await fetchAnalyticsData(
+        //   "overview", 
+        //   transactionTimeframe, 
+        //   dateRange.from, 
+        //   dateRange.to
+        // );
         
-        const processedData = processAnalyticsResponse(analyticsResult);
-        setSuccessRateData(processedData.successRate);
+        // const processedData = processAnalyticsResponse(analyticsResult);
+        // setSuccessRateData(processedData.successRate);
         
         const transactionResult = await fetchAnalyticsData(
           "transactions", 
@@ -58,7 +58,7 @@ const Dashboard = () => {
           dateRange.from, 
           dateRange.to
         );
-        setTransactionData(transactionResult.data || []);
+        setTransactionData(transactionResult || []);
       } catch (err) {
         console.error("Error fetching analytics data:", err);
         setError("Failed to load data. Please try again.");
