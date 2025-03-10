@@ -23,7 +23,6 @@ const Dashboard = () => {
   const calendarRef = useRef(null);
   
   const [transactionData, setTransactionData] = useState([]);
-  const [userData, setUserData] = useState([]);
   const [successRateData, setSuccessRateData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -60,20 +59,11 @@ const Dashboard = () => {
           dateRange.to
         );
         setTransactionData(transactionResult.data || []);
-        
-        const userResult = await fetchAnalyticsData(
-          "users", 
-          usersTimeframe, 
-          dateRange.from, 
-          dateRange.to
-        );
-        setUserData(userResult.data || []);
       } catch (err) {
         console.error("Error fetching analytics data:", err);
         setError("Failed to load data. Please try again.");
         
         setTransactionData(getMockTransactionData(transactionTimeframe));
-        setUserData(getMockUserData(usersTimeframe));
         
         setSuccessRateData({
           title: "Success Rate",
@@ -380,17 +370,17 @@ const Dashboard = () => {
           timeframes={["12months", "30days", "7days"]}
           initialTimeframe={transactionTimeframe}
           onTimeframeChange={setTransactionTimeframe}
-          color="#FFC107"
+          color="#9b87f5"
           isLoading={isLoading}
         />
 
         <ChartCard
           title="Users Aggregated"
-          data={userData}
+          data={transactionData}
           timeframes={["12months", "30days", "7days"]}
           initialTimeframe={usersTimeframe}
           onTimeframeChange={setUsersTimeframe}
-          color="#F472B6"
+          color="#D946EF"
           isLoading={isLoading}
         />
 
@@ -399,16 +389,16 @@ const Dashboard = () => {
           data={transactionData}
           timeframes={["12months", "30days", "7days"]}
           initialTimeframe="7days"
-          color="#4ADE80"
+          color="#0EA5E9"
           isLoading={isLoading}
         />
 
         <ChartCard
           title="Repeat Users"
-          data={userData}
+          data={transactionData}
           timeframes={["12months", "30days", "7days"]}
           initialTimeframe="7days"
-          color="#60A5FA"
+          color="#F97316"
           isLoading={isLoading}
         />
       </div>
