@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronDown, LogOut, User, Menu } from "lucide-react";
@@ -59,7 +60,7 @@ const Header = ({ toggleSidebar }) => {
             </button>
 
             {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-full min-w-[192px] bg-white rounded shadow-lg py-1 z-50">
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded shadow-lg py-1 z-50">
                 <div className="px-4 py-3 border-b border-gray-100">
                   <p className="text-sm font-semibold">Account Actions</p>
                 </div>

@@ -4,9 +4,7 @@ import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import NotFound from "./pages/NotFound";
 import DashboardLayout from "./components/layout/DashboardLayout";
-
-// Placeholder component for the dashboard home
-const DashboardHome = () => <div className="p-8"><h1 className="text-2xl font-bold">Dashboard Home</h1></div>;
+import DashboardHome from "./pages/DashboardHome";
 
 // Placeholder components for dashboard routes
 const Components = () => <div className="p-8"><h1 className="text-2xl font-bold">Components Page</h1></div>;

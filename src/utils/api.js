@@ -1,3 +1,4 @@
+
 /**
  * API utility functions for making HTTP requests
  */
@@ -80,4 +81,14 @@ export const loginApi = (email, password) => {
     method: "POST",
     body: JSON.stringify({ email, password }),
   });
+};
+
+/**
+ * Fetch dashboard analytics data
+ * @param {Object} params - Query parameters like date range
+ * @returns {Promise<Object>} - Analytics data
+ */
+export const fetchDashboardData = (params = {}) => {
+  const queryString = new URLSearchParams(params).toString();
+  return fetchApi(`/dashboard/analytics/v1/dashboard?${queryString}`);
 };

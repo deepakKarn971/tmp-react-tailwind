@@ -31,7 +31,7 @@ const DashboardLayout = () => {
       );
     }
 
-    // Fetch user data (this is a placeholder)
+    // Fetch user data
     const fetchData = async () => {
       try {
         setLoading(false);
@@ -62,7 +62,7 @@ const DashboardLayout = () => {
       <div className="flex flex-1 overflow-hidden">
         <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
         <main
-          className={`flex-1 overflow-y-auto transition-all duration-300`}
+          className="flex-1 overflow-y-auto transition-all duration-300"
         >
           {/* Only show breadcrumbs if not on the Dashboard page */}
           {!isDashboardPath && <Breadcrumbs />}
