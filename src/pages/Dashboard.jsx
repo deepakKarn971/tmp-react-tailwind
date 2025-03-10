@@ -1,19 +1,59 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { TrendingUp, Calendar, ChevronDown } from "lucide-react";
-import { format, isAfter, isBefore, isEqual } from "date-fns";
+import { TrendingUp, Calendar as CalendarIcon, ChevronDown, X } from "lucide-react";
+import { format, isAfter, isBefore, isEqual, addDays, subDays } from "date-fns";
 import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
-import { Calendar as CalendarComponent } from "../components/ui/calendar";
+import { Calendar } from "../components/ui/calendar";
 import { Button } from "../components/ui/button";
-import { cn } from "../lib/utils";
+import { cn, formatDateRange } from "../lib/utils";
 
 const Dashboard = () => {
   const [transactionTimeframe, setTransactionTimeframe] = useState("7days");
   const [usersTimeframe, setUsersTimeframe] = useState("7days");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedDateFilter, setSelectedDateFilter] = useState("Last 30 Days");
-  const [dateRange, setDateRange] = useState({ from: null, to: null });
+  const [dateRange, setDateRange] = useState({ 
+    from: subDays(new Date(), 30),
+    to: new Date()
+  });
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const calendarRef = useRef(null);
+  
+  useEffect(() => {
+    // Set initial date range based on selected filter
+    if (selectedDateFilter === "Last 30 Days") {
+      setDateRange({
+        from: subDays(new Date(), 30),
+        to: new Date()
+      });
+    } else if (selectedDateFilter === "Last 7 Days") {
+      setDateRange({
+        from: subDays(new Date(), 7),
+        to: new Date()
+      });
+    } else if (selectedDateFilter === "Yesterday") {
+      const yesterday = subDays(new Date(), 1);
+      setDateRange({
+        from: yesterday,
+        to: yesterday
+      });
+    }
+  }, [selectedDateFilter]);
+
+  useEffect(() => {
+    // Close dropdown when clicking outside
+    const handleClickOutside = (event) => {
+      if (isDropdownOpen && !event.target.closest('.date-filter-dropdown')) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isDropdownOpen]);
 
   // Mock transaction data
   const transactionData = {
@@ -65,12 +105,17 @@ const Dashboard = () => {
   const dateFilterOptions = [
     "Last 30 Days",
     "Last 7 Days",
-    "Yesterday"
+    "Yesterday",
+    "Custom Range"
   ];
 
   const handleDateFilterChange = (option) => {
     setSelectedDateFilter(option);
     setIsDropdownOpen(false);
+    
+    if (option === "Custom Range") {
+      setIsCalendarOpen(true);
+    }
   };
 
   return (
@@ -78,85 +123,125 @@ const Dashboard = () => {
       {/* Header with title and date filter */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Dashboard</h1>
-        <div className="flex items-center gap-4">
-          {/* Custom dropdown */}
-          <div className="relative">
-            <Button
-              variant="outline"
-              className="flex items-center gap-2 bg-white text-gray-800 border border-gray-200 rounded h-10"
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            >
-              <Calendar size={16} className="text-gray-500" />
-              <span>{selectedDateFilter}</span>
-              <ChevronDown size={16} className="text-gray-500" />
-            </Button>
+        <div className="flex items-center">
+          {/* Date Filter Section */}
+          <div className="flex bg-white shadow rounded-lg overflow-hidden">
+            {/* Custom dropdown */}
+            <div className="relative date-filter-dropdown border-r">
+              <Button
+                variant="ghost"
+                className="flex items-center gap-2 bg-white text-gray-700 h-12 px-4 py-3 rounded-none"
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              >
+                <CalendarIcon size={20} className="text-gray-500" />
+                <span className="text-gray-700 font-normal">{selectedDateFilter}</span>
+                <ChevronDown size={16} className="text-gray-500" />
+              </Button>
+              
+              {isDropdownOpen && (
+                <div className="absolute top-full mt-1 left-0 bg-white border border-gray-200 rounded shadow-lg z-50 w-48">
+                  <ul className="py-1">
+                    {dateFilterOptions.map((option) => (
+                      <li 
+                        key={option} 
+                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700"
+                        onClick={() => handleDateFilterChange(option)}
+                      >
+                        {option}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
             
-            {isDropdownOpen && (
-              <div className="absolute top-full mt-1 right-0 bg-white border border-gray-200 rounded shadow-lg z-50 w-48">
-                <ul className="py-1">
-                  {dateFilterOptions.map((option) => (
-                    <li 
-                      key={option} 
-                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                      onClick={() => handleDateFilterChange(option)}
+            {/* Date Range Display */}
+            <div className="px-4 flex items-center min-w-[260px] h-12">
+              <button 
+                className="text-gray-700 font-normal"
+                onClick={() => setIsCalendarOpen(!isCalendarOpen)}
+              >
+                {formatDateRange(dateRange.from, dateRange.to)}
+              </button>
+              
+              {/* Clear date button */}
+              {dateRange.from && (
+                <button 
+                  className="ml-2 text-gray-400 hover:text-gray-600"
+                  onClick={() => setDateRange({ from: null, to: null })}
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Calendar Popover */}
+          <div ref={calendarRef} className="relative">
+            {isCalendarOpen && (
+              <div className="absolute top-2 right-0 z-50">
+                <div className="bg-white rounded-lg shadow-lg p-4 border">
+                  <div className="flex justify-between mb-4">
+                    <h3 className="font-medium">Select Date Range</h3>
+                    <button 
+                      className="text-gray-400 hover:text-gray-600"
+                      onClick={() => setIsCalendarOpen(false)}
                     >
-                      {option}
-                    </li>
-                  ))}
-                </ul>
+                      <X size={16} />
+                    </button>
+                  </div>
+                  
+                  <div className="mb-4 grid grid-cols-2 gap-4">
+                    <div className="p-2 border rounded-md bg-gray-50">
+                      <label className="text-xs text-gray-500 block mb-1">Start Date</label>
+                      <div className="text-sm font-medium">
+                        {dateRange.from ? format(dateRange.from, "MMM d, yyyy") : "Select date"}
+                      </div>
+                    </div>
+                    <div className="p-2 border rounded-md bg-gray-50">
+                      <label className="text-xs text-gray-500 block mb-1">End Date</label>
+                      <div className="text-sm font-medium">
+                        {dateRange.to ? format(dateRange.to, "MMM d, yyyy") : "Select date"}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <Calendar
+                    mode="range"
+                    fromDate={dateRange.from}
+                    toDate={dateRange.to}
+                    onSelect={(range) => {
+                      setDateRange(range);
+                      if (range.from && range.to) {
+                        setSelectedDateFilter("Custom Range");
+                      }
+                    }}
+                    initialFocus
+                    className="border-t pt-4"
+                  />
+                  
+                  <div className="flex justify-end mt-4 space-x-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setIsCalendarOpen(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button 
+                      variant="default" 
+                      size="sm"
+                      onClick={() => setIsCalendarOpen(false)}
+                    >
+                      Apply
+                    </Button>
+                  </div>
+                </div>
               </div>
             )}
           </div>
           
-          {/* Date Range Picker */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="bg-white border border-gray-200 rounded text-gray-600 h-10 min-w-[200px] justify-between"
-              >
-                {dateRange.from ? (
-                  dateRange.to ? (
-                    <>
-                      {format(dateRange.from, "MMM dd, yyyy")} - {format(dateRange.to, "MMM dd, yyyy")}
-                    </>
-                  ) : (
-                    format(dateRange.from, "MMM dd, yyyy")
-                  )
-                ) : (
-                  "Select Date"
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 z-50" align="end">
-              <div className="p-3 border-b border-gray-200">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-sm font-medium">Start Date</label>
-                    <div className="border rounded p-2 text-sm">
-                      {dateRange.from ? format(dateRange.from, "MMM dd, yyyy") : "Select"}
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-sm font-medium">End Date</label>
-                    <div className="border rounded p-2 text-sm">
-                      {dateRange.to ? format(dateRange.to, "MMM dd, yyyy") : "Select"}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <CalendarComponent
-                mode="range"
-                fromDate={dateRange.from}
-                toDate={dateRange.to}
-                onSelect={setDateRange}
-                initialFocus
-                className="p-3 pointer-events-auto"
-              />
-            </PopoverContent>
-          </Popover>
-          
-          <Button variant="default" className="bg-blue-600 text-white h-10 px-8" size="default">
+          <Button variant="default" className="bg-blue-600 text-white h-12 px-8 ml-4 rounded-lg text-base font-medium">
             SEARCH
           </Button>
         </div>

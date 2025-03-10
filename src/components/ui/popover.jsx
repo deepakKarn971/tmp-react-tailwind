@@ -42,7 +42,7 @@ const PopoverTrigger = ({ asChild, children, ...props }) => {
   );
 };
 
-const PopoverContent = ({ className, align = "center", children, ...props }) => {
+const PopoverContent = ({ className, align = "center", sideOffset = 4, children, ...props }) => {
   const { open } = useContext(PopoverContext);
 
   if (!open) return null;
@@ -50,14 +50,17 @@ const PopoverContent = ({ className, align = "center", children, ...props }) => 
   return (
     <div
       className={cn(
-        "z-50 min-w-[8rem] overflow-hidden rounded border bg-white p-2 text-popover-foreground shadow-md animate-in fade-in-80 data-[side=bottom]:slide-in-from-top-1 data-[side=left]:slide-in-from-right-1 data-[side=right]:slide-in-from-left-1 data-[side=top]:slide-in-from-bottom-1",
+        "z-50 min-w-[8rem] overflow-hidden rounded-lg border bg-white shadow-lg animate-in fade-in-80 data-[side=bottom]:slide-in-from-top-1 data-[side=left]:slide-in-from-right-1 data-[side=right]:slide-in-from-left-1 data-[side=top]:slide-in-from-bottom-1",
         {
-          "absolute left-0 top-full mt-1": align === "start",
-          "absolute left-1/2 top-full mt-1 -translate-x-1/2": align === "center",
-          "absolute right-0 top-full mt-1": align === "end",
+          "absolute left-0 top-full mt-2": align === "start",
+          "absolute left-1/2 top-full mt-2 -translate-x-1/2": align === "center",
+          "absolute right-0 top-full mt-2": align === "end",
         },
         className
       )}
+      style={{
+        marginTop: sideOffset,
+      }}
       {...props}
     >
       {children}
