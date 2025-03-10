@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { ArrowUp, ArrowDown } from "lucide-react";
-import { fetchApi } from "../../utils/api";
+import { fetchDataPoints } from "../../utils/api";
 
 const SuccessRateCard = ({ title, timeRange, fromDate, toDate, valueKey }) => {
   const [data, setData] = useState({
@@ -24,10 +24,7 @@ const SuccessRateCard = ({ title, timeRange, fromDate, toDate, valueKey }) => {
         
         console.log("Fetching data points with payload:", payload);
         
-        const response = await fetchApi("/dashboard/merchant-dashboard/v1/analytics/data-points", {
-          method: "POST",
-          body: JSON.stringify(payload),
-        });
+        const response = await fetchDataPoints(payload);
         
         if (response && response.data) {
           const metricData = response.data[valueKey] || {};
