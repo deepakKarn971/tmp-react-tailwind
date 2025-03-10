@@ -5,7 +5,12 @@ import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popove
 import { Calendar } from "../components/ui/calendar";
 import { Button } from "../components/ui/button";
 import { cn, formatDateRange } from "../lib/utils";
-import { fetchAnalyticsData, processAnalyticsResponse } from "../utils/api";
+import { 
+  fetchAnalyticsData, 
+  processAnalyticsResponse, 
+  getMockTransactionData,
+  getMockUserData
+} from "../utils/api";
 import BarChartComponent from "../components/charts/BarChartComponent";
 import LineChartComponent from "../components/charts/LineChartComponent";
 import ChartCard from "../components/charts/ChartCard";
@@ -23,6 +28,9 @@ const Dashboard = () => {
   const calendarRef = useRef(null);
   
   const [transactionData, setTransactionData] = useState([]);
+  const [usersData, setUsersData] = useState([]);
+  const [firstTimeUsersData, setFirstTimeUsersData] = useState([]);
+  const [repeatUsersData, setRepeatUsersData] = useState([]);
   const [successRateData, setSuccessRateData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -42,28 +50,60 @@ const Dashboard = () => {
       setError(null);
       
       try {
-        // const analyticsResult = await fetchAnalyticsData(
-        //   "overview", 
-        //   transactionTimeframe, 
-        //   dateRange.from, 
-        //   dateRange.to
-        // );
-        
-        // const processedData = processAnalyticsResponse(analyticsResult);
-        // setSuccessRateData(processedData.successRate);
-        
         const transactionResult = await fetchAnalyticsData(
           "transactions", 
           transactionTimeframe, 
           dateRange.from, 
           dateRange.to
         );
-        setTransactionData(transactionResult || []);
+        
+        if (transactionResult && transactionResult.data) {
+          const processedData = processAnalyticsResponse(transactionResult);
+          setTransactionData(processedData.transactionData);
+          
+          if (processedData.successRate) {
+            setSuccessRateData(processedData.successRate);
+          }
+        } else {
+          setTransactionData(getMockTransactionData(transactionTimeframe));
+        }
+        
+        const usersResult = await fetchAnalyticsData(
+          "users", 
+          usersTimeframe, 
+          dateRange.from, 
+          dateRange.to
+        );
+        
+        if (usersResult && usersResult.data) {
+          const processedData = processAnalyticsResponse(usersResult);
+          setUsersData(processedData.transactionData);
+        } else {
+          setUsersData(getMockUserData(usersTimeframe));
+        }
+        
+        setFirstTimeUsersData(getMockUserData("7days"));
+        setRepeatUsersData(getMockUserData("7days"));
+        
+        if (!successRateData) {
+          setSuccessRateData({
+            title: "Success Rate",
+            value: 28.35,
+            valuePrefix: "",
+            valueSuffix: "%",
+            percentageGrowth: "7.02%",
+            comparisionRange: "last month",
+            dataArray: [28.28, 27.62, 30.20, 28.53, 28.91, 28.28, 26.88, 26.74, 27.37, 29.74]
+          });
+        }
       } catch (err) {
         console.error("Error fetching analytics data:", err);
         setError("Failed to load data. Please try again.");
         
         setTransactionData(getMockTransactionData(transactionTimeframe));
+        setUsersData(getMockUserData(usersTimeframe));
+        setFirstTimeUsersData(getMockUserData("7days"));
+        setRepeatUsersData(getMockUserData("7days"));
         
         setSuccessRateData({
           title: "Success Rate",
@@ -352,11 +392,12 @@ const Dashboard = () => {
             <span className="font-medium">{successRateData?.percentageGrowth || "0%"}</span>
             <span className="text-gray-600 ml-1">{successRateData?.comparisionRange || "last month"}</span>
           </div>
-          <div className="mt-4 h-20">
+          <div className="mt-4" style={{ height: "120px" }}>
             {successRateData?.dataArray && (
               <LineChartComponent 
                 data={formatSuccessRateData(successRateData.dataArray)}
                 lineColor="#f87171"
+                height={100}
               />
             )}
           </div>
@@ -376,7 +417,7 @@ const Dashboard = () => {
 
         <ChartCard
           title="Users Aggregated"
-          data={transactionData}
+          data={usersData}
           timeframes={["12months", "30days", "7days"]}
           initialTimeframe={usersTimeframe}
           onTimeframeChange={setUsersTimeframe}
@@ -386,7 +427,7 @@ const Dashboard = () => {
 
         <ChartCard
           title="First Time Users"
-          data={transactionData}
+          data={firstTimeUsersData}
           timeframes={["12months", "30days", "7days"]}
           initialTimeframe="7days"
           color="#0EA5E9"
@@ -395,7 +436,7 @@ const Dashboard = () => {
 
         <ChartCard
           title="Repeat Users"
-          data={transactionData}
+          data={repeatUsersData}
           timeframes={["12months", "30days", "7days"]}
           initialTimeframe="7days"
           color="#F97316"

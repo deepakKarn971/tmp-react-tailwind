@@ -6,16 +6,18 @@ const LineChartComponent = ({
   data = [], 
   lineColor = "#f87171", 
   dataKey = "value",
-  height = "100%",
+  height = 300,
   emptyMessage = "No data available for selected period"
 }) => {
-  if (data.length === 0) {
+  if (!data || data.length === 0) {
     return (
       <div className="h-full flex items-center justify-center">
         <p className="text-gray-500">{emptyMessage}</p>
       </div>
     );
   }
+  
+  console.log('Line chart rendering with data:', data);
   
   return (
     <ResponsiveContainer width="100%" height={height}>

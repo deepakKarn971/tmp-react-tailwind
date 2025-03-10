@@ -9,7 +9,7 @@ const ChartCard = ({
   initialTimeframe = "7days",
   onTimeframeChange,
   color = "#FFC107",
-  height = "64",
+  height = 300,
   isLoading = false
 }) => {
   const [timeframe, setTimeframe] = useState(initialTimeframe);
@@ -20,6 +20,8 @@ const ChartCard = ({
       onTimeframeChange(newTimeframe);
     }
   };
+  
+  console.log(`Chart card "${title}" rendering with data:`, data);
   
   return (
     <div className="bg-white shadow rounded-lg p-6">
@@ -50,13 +52,13 @@ const ChartCard = ({
           </button>
         )}
       </div>
-      <div className={`h-${height}`}>
+      <div style={{ height: `${height}px` }}>
         {isLoading ? (
           <div className="h-full flex items-center justify-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
           </div>
         ) : (
-          <BarChartComponent data={data} barColor={color} />
+          <BarChartComponent data={data} barColor={color} height={height} />
         )}
       </div>
     </div>
