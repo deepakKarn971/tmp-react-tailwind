@@ -54,7 +54,9 @@ const DashboardLayout = () => {
     <div className="flex flex-col h-screen bg-background">
       <Header toggleSidebar={toggleSidebar} />
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} toggleSidebar={toggleSidebar} />
+        {isSidebarOpen && (
+          <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+        )}
         <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
           <Breadcrumbs />
           <Outlet /> {/* This renders the child route components */}
