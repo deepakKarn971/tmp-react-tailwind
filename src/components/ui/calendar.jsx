@@ -1,10 +1,19 @@
 
 import React, { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { addDays, format, getMonth, getYear, isEqual, isToday, startOfMonth, startOfWeek, addMonths, subMonths, eachDayOfInterval, endOfMonth, endOfWeek } from "date-fns";
+import { format, isEqual, isToday, startOfMonth, startOfWeek, addMonths, subMonths, eachDayOfInterval, endOfMonth, endOfWeek, isSameMonth, isWithinInterval } from "date-fns";
 import { cn } from "../../lib/utils";
 
-const Calendar = ({ className, mode = "single", selected, onSelect, disabled, ...props }) => {
+const Calendar = ({ 
+  className, 
+  mode = "single", 
+  selected, 
+  onSelect, 
+  disabled, 
+  fromDate,
+  toDate,
+  ...props 
+}) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   
   const renderHeader = () => {
@@ -55,12 +64,21 @@ const Calendar = ({ className, mode = "single", selected, onSelect, disabled, ..
       end: endDate,
     });
 
+    const isRangeSelected = mode === "range" && fromDate && toDate;
+    const isStartDateSelected = mode === "range" && fromDate && !toDate;
+
     return (
       <div className="grid grid-cols-7 gap-1">
         {dateRange.map((date, i) => {
-          const isOutsideMonth = getMonth(date) !== getMonth(currentMonth);
+          const isOutsideMonth = !isSameMonth(date, currentMonth);
           const isDisabled = disabled?.(date) || false;
-          const isSelectedDate = selected && isEqual(date, selected);
+          const isSelectedDate = mode === "single" && selected && isEqual(date, selected);
+          
+          // For range selection
+          const isInRange = isRangeSelected && isWithinInterval(date, { start: fromDate, end: toDate });
+          const isRangeStart = isRangeSelected && isEqual(date, fromDate);
+          const isRangeEnd = isRangeSelected && isEqual(date, toDate);
+          const isStartDate = isStartDateSelected && isEqual(date, fromDate);
           
           return (
             <div
@@ -70,12 +88,26 @@ const Calendar = ({ className, mode = "single", selected, onSelect, disabled, ..
                 isOutsideMonth && "text-gray-300",
                 !isOutsideMonth && !isDisabled && "hover:bg-gray-100 cursor-pointer",
                 isSelectedDate && "bg-primary text-white hover:bg-primary",
-                isToday(date) && "border border-primary font-semibold",
+                (isRangeStart || isRangeEnd) && "bg-primary text-white hover:bg-primary",
+                isInRange && !isRangeStart && !isRangeEnd && "bg-primary/10",
+                isStartDate && "bg-primary text-white hover:bg-primary",
+                isToday(date) && !isSelectedDate && !isInRange && !isRangeStart && !isRangeEnd && !isStartDate && "border border-primary font-semibold",
                 isDisabled && "text-gray-300 cursor-not-allowed"
               )}
               onClick={() => {
                 if (isDisabled || isOutsideMonth) return;
-                onSelect?.(date);
+                
+                if (mode === "single") {
+                  onSelect?.(date);
+                } else if (mode === "range") {
+                  if (!fromDate || (fromDate && toDate)) {
+                    onSelect?.({ from: date, to: undefined });
+                  } else {
+                    const newTo = date < fromDate ? fromDate : date;
+                    const newFrom = date < fromDate ? date : fromDate;
+                    onSelect?.({ from: newFrom, to: newTo });
+                  }
+                }
               }}
             >
               {format(date, "d")}
@@ -87,7 +119,7 @@ const Calendar = ({ className, mode = "single", selected, onSelect, disabled, ..
   };
 
   return (
-    <div className={cn("p-3", className)} {...props}>
+    <div className={cn("p-3 pointer-events-auto", className)} {...props}>
       {renderHeader()}
       {renderDays()}
       {renderCells()}

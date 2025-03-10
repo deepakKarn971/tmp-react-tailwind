@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useRef, useEffect } from "react";
 import { cn } from "../../lib/utils";
 
 const PopoverContext = createContext({
@@ -9,10 +9,24 @@ const PopoverContext = createContext({
 
 const Popover = ({ children }) => {
   const [open, setOpen] = useState(false);
+  const popoverRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (popoverRef.current && !popoverRef.current.contains(event.target)) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <PopoverContext.Provider value={{ open, setOpen }}>
-      <div className="relative inline-block">{children}</div>
+      <div className="relative inline-block" ref={popoverRef}>{children}</div>
     </PopoverContext.Provider>
   );
 };
@@ -36,7 +50,7 @@ const PopoverContent = ({ className, align = "center", children, ...props }) => 
   return (
     <div
       className={cn(
-        "z-50 min-w-[8rem] overflow-hidden rounded border bg-popover p-2 text-popover-foreground shadow-md animate-in fade-in-80 data-[side=bottom]:slide-in-from-top-1 data-[side=left]:slide-in-from-right-1 data-[side=right]:slide-in-from-left-1 data-[side=top]:slide-in-from-bottom-1",
+        "z-50 min-w-[8rem] overflow-hidden rounded border bg-white p-2 text-popover-foreground shadow-md animate-in fade-in-80 data-[side=bottom]:slide-in-from-top-1 data-[side=left]:slide-in-from-right-1 data-[side=right]:slide-in-from-left-1 data-[side=top]:slide-in-from-bottom-1",
         {
           "absolute left-0 top-full mt-1": align === "start",
           "absolute left-1/2 top-full mt-1 -translate-x-1/2": align === "center",
