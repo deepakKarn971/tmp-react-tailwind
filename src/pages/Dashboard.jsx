@@ -11,7 +11,7 @@ const Dashboard = () => {
           <button className="px-3 py-1 bg-gray-100 rounded">30 days</button>
           <button className="px-3 py-1 bg-primary text-white rounded">7 days</button>
         </div>
-        <div className="h-64 bg-gray-50 rounded-md flex items-center justify-center">
+        <div className="h-64 bg-gray-50 rounded flex items-center justify-center">
           <p className="text-gray-500">Transaction chart will appear here</p>
         </div>
       </div>
@@ -23,21 +23,21 @@ const Dashboard = () => {
           <button className="px-3 py-1 bg-gray-100 rounded">30 days</button>
           <button className="px-3 py-1 bg-primary text-white rounded">7 days</button>
         </div>
-        <div className="h-64 bg-gray-50 rounded-md flex items-center justify-center">
+        <div className="h-64 bg-gray-50 rounded flex items-center justify-center">
           <p className="text-gray-500">Users chart will appear here</p>
         </div>
       </div>
 
       <div className="bg-white shadow rounded-lg p-6">
         <h2 className="text-xl font-semibold mb-4">First Time Users</h2>
-        <div className="h-64 bg-gray-50 rounded-md flex items-center justify-center">
+        <div className="h-64 bg-gray-50 rounded flex items-center justify-center">
           <p className="text-gray-500">First time users data will appear here</p>
         </div>
       </div>
 
       <div className="bg-white shadow rounded-lg p-6">
         <h2 className="text-xl font-semibold mb-4">Repeat Users</h2>
-        <div className="h-64 bg-gray-50 rounded-md flex items-center justify-center">
+        <div className="h-64 bg-gray-50 rounded flex items-center justify-center">
           <p className="text-gray-500">Repeat users data will appear here</p>
         </div>
       </div>
