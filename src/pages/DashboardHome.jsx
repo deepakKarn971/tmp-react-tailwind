@@ -1,11 +1,12 @@
 
 import React, { useState, useEffect } from "react";
 import { Calendar, ChevronDown, Search } from "lucide-react";
-import { format, parse, startOfDay, endOfDay, subDays } from "date-fns";
+import { format, startOfDay, endOfDay, subDays } from "date-fns";
 import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
 import { Calendar as CalendarComponent } from "../components/ui/calendar";
 import { cn } from "../lib/utils";
 import SuccessRateCard from "../components/dashboard/SuccessRateCard";
+import { fetchDataPoints } from "../utils/api";
 
 const DashboardHome = () => {
   const [dateRange, setDateRange] = useState("Last 30 Days");
@@ -13,6 +14,12 @@ const DashboardHome = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [metricsData, setMetricsData] = useState({
+    successRate: { value: 0, change: 0 },
+    conversionRate: { value: 0, change: 0 },
+    averageOrderValue: { value: 0, change: 0 }
+  });
   
   // State to track different time ranges for different metrics
   const [timeRanges, setTimeRanges] = useState({
@@ -57,6 +64,49 @@ const DashboardHome = () => {
     setToDate(to);
   }, [dateRange, selectedDate]);
 
+  // Fetch data points for all metrics at once
+  useEffect(() => {
+    const fetchMetricsData = async () => {
+      if (!fromDate || !toDate) return;
+      
+      setLoading(true);
+      try {
+        const payload = {
+          range: timeRanges.dataPoints,
+          fromDate: fromDate,
+          toDate: toDate,
+        };
+        
+        console.log("Fetching data points with payload:", payload);
+        
+        const response = await fetchDataPoints(payload);
+        
+        if (response && response.data) {
+          setMetricsData({
+            successRate: {
+              value: response.data.successRate?.value || 0,
+              change: response.data.successRate?.change || 0
+            },
+            conversionRate: {
+              value: response.data.conversionRate?.value || 0,
+              change: response.data.conversionRate?.change || 0
+            },
+            averageOrderValue: {
+              value: response.data.averageOrderValue?.value || 0,
+              change: response.data.averageOrderValue?.change || 0
+            }
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching metrics data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMetricsData();
+  }, [fromDate, toDate, timeRanges.dataPoints]);
+
   const handleDateRangeChange = (range) => {
     setDateRange(range);
     setIsDateDropdownOpen(false);
@@ -76,6 +126,37 @@ const DashboardHome = () => {
       timeRanges
     });
   };
+
+  // Format metrics data for card rendering
+  const metricsCardsData = [
+    {
+      title: "Success Rate",
+      value: metricsData.successRate.value,
+      valuePrefix: "",
+      valueSuffix: "%",
+      percentageGrowth: metricsData.successRate.change,
+      comparisionRange: "vs previous period",
+      dataArray: [] // We could populate this with historical data if available
+    },
+    {
+      title: "Conversion Rate",
+      value: metricsData.conversionRate.value,
+      valuePrefix: "",
+      valueSuffix: "%",
+      percentageGrowth: metricsData.conversionRate.change,
+      comparisionRange: "vs previous period",
+      dataArray: []
+    },
+    {
+      title: "Average Order Value",
+      value: metricsData.averageOrderValue.value,
+      valuePrefix: "₹",
+      valueSuffix: "",
+      percentageGrowth: metricsData.averageOrderValue.change,
+      comparisionRange: "vs previous period",
+      dataArray: []
+    }
+  ];
 
   return (
     <div className="p-6 md:p-8">
@@ -149,31 +230,13 @@ const DashboardHome = () => {
 
       {/* Dashboard Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <SuccessRateCard 
-          title="Success Rate"
-          timeRange={timeRanges.dataPoints}
-          fromDate={fromDate}
-          toDate={toDate}
-          valueKey="successRate"
-        />
-        
-        <SuccessRateCard 
-          title="Conversion Rate"
-          timeRange={timeRanges.dataPoints}
-          fromDate={fromDate}
-          toDate={toDate}
-          valueKey="conversionRate"
-        />
-        
-        <SuccessRateCard 
-          title="Average Order Value"
-          timeRange={timeRanges.dataPoints}
-          fromDate={fromDate}
-          toDate={toDate}
-          valueKey="averageOrderValue"
-        />
-        
-        {/* You can add more cards as needed */}
+        {metricsCardsData.map((cardData, index) => (
+          <SuccessRateCard 
+            key={index}
+            loading={loading}
+            data={cardData}
+          />
+        ))}
       </div>
     </div>
   );

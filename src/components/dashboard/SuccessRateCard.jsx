@@ -1,54 +1,29 @@
-import React, { useState, useEffect } from "react";
+
+import React from "react";
 import { ArrowUp, ArrowDown } from "lucide-react";
-import { fetchDataPoints } from "../../utils/api";
 
-const SuccessRateCard = ({ title, timeRange, fromDate, toDate, valueKey }) => {
-  const [data, setData] = useState({
-    value: 0,
-    change: 0,
-    isPositive: true,
-  });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+const SuccessRateCard = ({ loading, data }) => {
+  if (!data) {
+    return null;
+  }
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const payload = {
-          range: timeRange,
-          fromDate: fromDate || undefined,
-          toDate: toDate || undefined,
-        };
-        
-        console.log("Fetching data points with payload:", payload);
-        
-        const response = await fetchDataPoints(payload);
-        
-        if (response && response.data) {
-          const metricData = response.data[valueKey] || {};
-          setData({
-            value: metricData.value || 0,
-            change: metricData.change || 0,
-            isPositive: metricData.change >= 0,
-          });
-        }
-      } catch (err) {
-        console.error("Error fetching data points:", err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const { 
+    title, 
+    value = 0, 
+    valuePrefix = "",
+    valueSuffix = "",
+    percentageGrowth = 0,
+    comparisionRange = "vs previous period"
+  } = data;
 
-    fetchData();
-  }, [timeRange, fromDate, toDate, valueKey]);
+  // Determine if the growth is positive or negative
+  const isPositive = percentageGrowth >= 0;
+
+  // Set color based on positive/negative value
+  const color = isPositive ? "green" : "red";
 
   // Custom gradient ID to avoid conflicts when using multiple cards
   const gradientId = `gradient-${title.replace(/\s+/g, '-').toLowerCase()}`;
-
-  // Set color based on positive/negative value
-  const color = data.isPositive ? "green" : "red";
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
@@ -58,26 +33,25 @@ const SuccessRateCard = ({ title, timeRange, fromDate, toDate, valueKey }) => {
         <div className="flex justify-center items-center h-16">
           <div className="animate-pulse bg-gray-200 h-8 w-24 rounded"></div>
         </div>
-      ) : error ? (
-        <div className="text-red-500 text-sm">Error loading data</div>
       ) : (
         <div className="flex items-end justify-between">
           <div>
             <div className="flex items-baseline">
-              <span className="text-4xl font-bold">{data.value}</span>
-              <span className="text-2xl font-medium ml-1">%</span>
+              {valuePrefix && <span className="text-2xl font-medium mr-1">{valuePrefix}</span>}
+              <span className="text-4xl font-bold">{value}</span>
+              {valueSuffix && <span className="text-2xl font-medium ml-1">{valueSuffix}</span>}
             </div>
             
             <div className="flex items-center mt-2">
-              {data.isPositive ? (
+              {isPositive ? (
                 <ArrowUp className={`h-5 w-5 text-${color}-500 mr-1`} />
               ) : (
                 <ArrowDown className={`h-5 w-5 text-${color}-500 mr-1`} />
               )}
               <span className={`font-medium text-${color}-500`}>
-                {Math.abs(data.change)}%
+                {Math.abs(percentageGrowth)}%
               </span>
-              <span className="text-gray-500 ml-1">vs previous period</span>
+              <span className="text-gray-500 ml-1">{comparisionRange}</span>
             </div>
           </div>
           
