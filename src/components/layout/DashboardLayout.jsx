@@ -17,7 +17,6 @@ const DashboardLayout = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  const cookie = getCookie(AUTH_CONFIG.AUTH_COOKIE_NAME);
   useEffect(() => {
     // Check if user is authenticated
     // setCookie(AUTH_CONFIG.AUTH_COOKIE_NAME, data.token, AUTH_CONFIG.TOKEN_EXPIRY_DAYS);
@@ -65,7 +64,6 @@ const DashboardLayout = () => {
           className={`flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 transition-all duration-300`}
         >
           <Breadcrumbs />
-          <div>{cookie}</div>
           <Outlet /> {/* This renders the child route components */}
         </main>
       </div>
