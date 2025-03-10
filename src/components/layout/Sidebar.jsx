@@ -11,7 +11,8 @@ import {
   Settings,
   ChevronDown, 
   ChevronRight, 
-  X 
+  X,
+  ChevronLeft
 } from "lucide-react";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
@@ -126,10 +127,20 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     },
   ];
 
-  if (!isOpen) return null;
+  if (!isOpen) return (
+    <div className="w-12 bg-white border-r border-gray-200 h-[calc(100vh-64px)] flex items-center justify-center">
+      <button 
+        className="p-2 rounded-full bg-primary text-white hover:bg-primary/90 transition-colors"
+        onClick={toggleSidebar}
+        aria-label="Open sidebar"
+      >
+        <ChevronRight size={20} />
+      </button>
+    </div>
+  );
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 h-[calc(100vh-64px)] overflow-y-auto">
+    <aside className="w-64 bg-white border-r border-gray-200 h-[calc(100vh-64px)] overflow-y-auto relative">
       <div className="py-4 flex flex-col h-full">
         <div className="flex items-center justify-between px-4 mb-6">
           <div className="flex items-center">
@@ -213,9 +224,22 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             </div>
           ))}
         </div>
+        
+        {/* Toggle arrow at the bottom */}
+        <div className="px-4 py-3 border-t border-gray-200">
+          <button 
+            className="flex items-center justify-center w-full p-2 rounded-md hover:bg-gray-100 text-gray-500"
+            onClick={toggleSidebar}
+            aria-label="Close sidebar"
+          >
+            <ChevronLeft size={20} />
+            <span className="ml-2 text-sm">Collapse</span>
+          </button>
+        </div>
       </div>
     </aside>
   );
 };
 
 export default Sidebar;
+
