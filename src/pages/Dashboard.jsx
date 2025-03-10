@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
 import { TrendingUp, Calendar as CalendarIcon, ChevronDown, X } from "lucide-react";
 import { format, isAfter, isBefore, isEqual, addDays, subDays } from "date-fns";
 import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
@@ -7,6 +6,9 @@ import { Calendar } from "../components/ui/calendar";
 import { Button } from "../components/ui/button";
 import { cn, formatDateRange } from "../lib/utils";
 import { fetchAnalyticsData, processAnalyticsResponse } from "../utils/api";
+import BarChartComponent from "../components/charts/BarChartComponent";
+import LineChartComponent from "../components/charts/LineChartComponent";
+import ChartCard from "../components/charts/ChartCard";
 
 const Dashboard = () => {
   const [transactionTimeframe, setTransactionTimeframe] = useState("7days");
@@ -362,128 +364,53 @@ const Dashboard = () => {
           </div>
           <div className="mt-4 h-20">
             {successRateData?.dataArray && (
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  data={formatSuccessRateData(successRateData.dataArray)}
-                  margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
-                >
-                  <Line
-                    type="monotone"
-                    dataKey="value"
-                    stroke="#f87171"
-                    strokeWidth={2}
-                    dot={false}
-                    isAnimationActive={true}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              <LineChartComponent 
+                data={formatSuccessRateData(successRateData.dataArray)}
+                lineColor="#f87171"
+              />
             )}
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-lg font-semibold mb-4">Transactions Aggregated</h2>
-          <div className="mb-4 flex space-x-2">
-            <button 
-              className={`px-3 py-1 rounded ${transactionTimeframe === "12months" ? "bg-primary text-white" : "bg-gray-100"}`}
-              onClick={() => setTransactionTimeframe("12months")}
-            >
-              12 months
-            </button>
-            <button 
-              className={`px-3 py-1 rounded ${transactionTimeframe === "30days" ? "bg-primary text-white" : "bg-gray-100"}`}
-              onClick={() => setTransactionTimeframe("30days")}
-            >
-              30 days
-            </button>
-            <button 
-              className={`px-3 py-1 rounded ${transactionTimeframe === "7days" ? "bg-primary text-white" : "bg-gray-100"}`}
-              onClick={() => setTransactionTimeframe("7days")}
-            >
-              7 days
-            </button>
-          </div>
-          <div className="h-64">
-            {!isLoading && transactionData.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={transactionData}
-                  margin={{ top: 5, right: 20, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                  <YAxis axisLine={false} tickLine={false} />
-                  <Tooltip />
-                  <Bar dataKey="value" fill="#FFC107" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            ) : !isLoading && transactionData.length === 0 ? (
-              <div className="h-full flex items-center justify-center">
-                <p className="text-gray-500">No transaction data available for selected period</p>
-              </div>
-            ) : null}
-          </div>
-        </div>
+        <ChartCard
+          title="Transactions Aggregated"
+          data={transactionData}
+          timeframes={["12months", "30days", "7days"]}
+          initialTimeframe={transactionTimeframe}
+          onTimeframeChange={setTransactionTimeframe}
+          color="#FFC107"
+          isLoading={isLoading}
+        />
 
-        <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-lg font-semibold mb-4">Users Aggregated</h2>
-          <div className="mb-4 flex space-x-2">
-            <button 
-              className={`px-3 py-1 rounded ${usersTimeframe === "12months" ? "bg-primary text-white" : "bg-gray-100"}`}
-              onClick={() => setUsersTimeframe("12months")}
-            >
-              12 months
-            </button>
-            <button 
-              className={`px-3 py-1 rounded ${usersTimeframe === "30days" ? "bg-primary text-white" : "bg-gray-100"}`}
-              onClick={() => setUsersTimeframe("30days")}
-            >
-              30 days
-            </button>
-            <button 
-              className={`px-3 py-1 rounded ${usersTimeframe === "7days" ? "bg-primary text-white" : "bg-gray-100"}`}
-              onClick={() => setUsersTimeframe("7days")}
-            >
-              7 days
-            </button>
-          </div>
-          <div className="h-64">
-            {!isLoading && userData.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={userData}
-                  margin={{ top: 5, right: 20, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                  <YAxis axisLine={false} tickLine={false} />
-                  <Tooltip />
-                  <Bar dataKey="value" fill="#F472B6" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            ) : !isLoading && userData.length === 0 ? (
-              <div className="h-full flex items-center justify-center">
-                <p className="text-gray-500">No user data available for selected period</p>
-              </div>
-            ) : null}
-          </div>
-        </div>
+        <ChartCard
+          title="Users Aggregated"
+          data={userData}
+          timeframes={["12months", "30days", "7days"]}
+          initialTimeframe={usersTimeframe}
+          onTimeframeChange={setUsersTimeframe}
+          color="#F472B6"
+          isLoading={isLoading}
+        />
 
-        <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-lg font-semibold mb-4">First Time Users</h2>
-          <div className="h-64 bg-gray-50 rounded flex items-center justify-center">
-            <p className="text-gray-500">First time users data will appear here</p>
-          </div>
-        </div>
+        <ChartCard
+          title="First Time Users"
+          data={transactionData}
+          timeframes={["12months", "30days", "7days"]}
+          initialTimeframe="7days"
+          color="#4ADE80"
+          isLoading={isLoading}
+        />
 
-        <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-lg font-semibold mb-4">Repeat Users</h2>
-          <div className="h-64 bg-gray-50 rounded flex items-center justify-center">
-            <p className="text-gray-500">Repeat users data will appear here</p>
-          </div>
-        </div>
+        <ChartCard
+          title="Repeat Users"
+          data={userData}
+          timeframes={["12months", "30days", "7days"]}
+          initialTimeframe="7days"
+          color="#60A5FA"
+          isLoading={isLoading}
+        />
       </div>
     </div>
   );
