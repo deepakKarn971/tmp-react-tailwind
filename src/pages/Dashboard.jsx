@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { TrendingUp, Calendar as CalendarIcon, ChevronDown, X } from "lucide-react";
@@ -7,6 +6,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popove
 import { Calendar } from "../components/ui/calendar";
 import { Button } from "../components/ui/button";
 import { cn, formatDateRange } from "../lib/utils";
+import { fetchAnalyticsData } from "../utils/api";
 
 const Dashboard = () => {
   const [transactionTimeframe, setTransactionTimeframe] = useState("7days");
@@ -20,8 +20,47 @@ const Dashboard = () => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const calendarRef = useRef(null);
   
+  const [transactionData, setTransactionData] = useState([]);
+  const [userData, setUserData] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
-    // Set initial date range based on selected filter
+    const fetchData = async () => {
+      setIsLoading(true);
+      setError(null);
+      
+      try {
+        const transactionResult = await fetchAnalyticsData(
+          "transactions", 
+          transactionTimeframe, 
+          dateRange.from, 
+          dateRange.to
+        );
+        setTransactionData(transactionResult.data || []);
+        
+        const userResult = await fetchAnalyticsData(
+          "users", 
+          usersTimeframe, 
+          dateRange.from, 
+          dateRange.to
+        );
+        setUserData(userResult.data || []);
+      } catch (err) {
+        console.error("Error fetching analytics data:", err);
+        setError("Failed to load data. Please try again.");
+        
+        setTransactionData(getMockTransactionData(transactionTimeframe));
+        setUserData(getMockUserData(usersTimeframe));
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, [transactionTimeframe, usersTimeframe, dateRange.from, dateRange.to]);
+  
+  useEffect(() => {
     if (selectedDateFilter === "Last 30 Days") {
       setDateRange({
         from: subDays(new Date(), 30),
@@ -42,7 +81,6 @@ const Dashboard = () => {
   }, [selectedDateFilter]);
 
   useEffect(() => {
-    // Close dropdown when clicking outside
     const handleClickOutside = (event) => {
       if (isDropdownOpen && !event.target.closest('.date-filter-dropdown')) {
         setIsDropdownOpen(false);
@@ -55,51 +93,55 @@ const Dashboard = () => {
     };
   }, [isDropdownOpen]);
 
-  // Mock transaction data
-  const transactionData = {
-    "7days": [
-      { name: "Mon", value: 18885 },
-      { name: "Tue", value: 31888 },
-      { name: "Wed", value: 327023 },
-      { name: "Thu", value: 1159839 },
-    ],
-    "30days": [
-      { name: "Week 1", value: 245000 },
-      { name: "Week 2", value: 320000 },
-      { name: "Week 3", value: 480000 },
-      { name: "Week 4", value: 560000 },
-    ],
-    "12months": [
-      { name: "Jan", value: 1200000 },
-      { name: "Feb", value: 1350000 },
-      { name: "Mar", value: 1100000 },
-      { name: "Apr", value: 1450000 },
-      { name: "May", value: 1600000 },
-      { name: "Jun", value: 1750000 },
-    ],
+  const getMockTransactionData = (timeframe) => {
+    const mockData = {
+      "7days": [
+        { name: "Mon", value: 18885 },
+        { name: "Tue", value: 31888 },
+        { name: "Wed", value: 327023 },
+        { name: "Thu", value: 1159839 },
+      ],
+      "30days": [
+        { name: "Week 1", value: 245000 },
+        { name: "Week 2", value: 320000 },
+        { name: "Week 3", value: 480000 },
+        { name: "Week 4", value: 560000 },
+      ],
+      "12months": [
+        { name: "Jan", value: 1200000 },
+        { name: "Feb", value: 1350000 },
+        { name: "Mar", value: 1100000 },
+        { name: "Apr", value: 1450000 },
+        { name: "May", value: 1600000 },
+        { name: "Jun", value: 1750000 },
+      ],
+    };
+    return mockData[timeframe] || [];
   };
 
-  // Mock user data
-  const userData = {
-    "7days": [
-      { name: "Mon", value: 28276 },
-      { name: "Tue", value: 225498 },
-      { name: "Wed", value: 693058 },
-    ],
-    "30days": [
-      { name: "Week 1", value: 190000 },
-      { name: "Week 2", value: 230000 },
-      { name: "Week 3", value: 310000 },
-      { name: "Week 4", value: 380000 },
-    ],
-    "12months": [
-      { name: "Jan", value: 850000 },
-      { name: "Feb", value: 920000 },
-      { name: "Mar", value: 880000 },
-      { name: "Apr", value: 980000 },
-      { name: "May", value: 1050000 },
-      { name: "Jun", value: 1150000 },
-    ],
+  const getMockUserData = (timeframe) => {
+    const mockData = {
+      "7days": [
+        { name: "Mon", value: 28276 },
+        { name: "Tue", value: 225498 },
+        { name: "Wed", value: 693058 },
+      ],
+      "30days": [
+        { name: "Week 1", value: 190000 },
+        { name: "Week 2", value: 230000 },
+        { name: "Week 3", value: 310000 },
+        { name: "Week 4", value: 380000 },
+      ],
+      "12months": [
+        { name: "Jan", value: 850000 },
+        { name: "Feb", value: 920000 },
+        { name: "Mar", value: 880000 },
+        { name: "Apr", value: 980000 },
+        { name: "May", value: 1050000 },
+        { name: "Jun", value: 1150000 },
+      ],
+    };
+    return mockData[timeframe] || [];
   };
 
   const dateFilterOptions = [
@@ -118,15 +160,16 @@ const Dashboard = () => {
     }
   };
 
+  const handleSearch = () => {
+    setIsCalendarOpen(false);
+  };
+
   return (
     <div className="space-y-8">
-      {/* Header with title and date filter */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Dashboard</h1>
         <div className="flex items-center">
-          {/* Date Filter Section */}
           <div className="flex bg-white shadow rounded-lg overflow-hidden">
-            {/* Custom dropdown */}
             <div className="relative date-filter-dropdown border-r">
               <Button
                 variant="ghost"
@@ -155,7 +198,6 @@ const Dashboard = () => {
               )}
             </div>
             
-            {/* Date Range Display */}
             <div className="px-4 flex items-center min-w-[260px] h-12">
               <button 
                 className="text-gray-700 font-normal"
@@ -164,7 +206,6 @@ const Dashboard = () => {
                 {formatDateRange(dateRange.from, dateRange.to)}
               </button>
               
-              {/* Clear date button */}
               {dateRange.from && (
                 <button 
                   className="ml-2 text-gray-400 hover:text-gray-600"
@@ -176,7 +217,6 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Calendar Popover */}
           <div ref={calendarRef} className="relative">
             {isCalendarOpen && (
               <div className="absolute top-2 right-0 z-50">
@@ -231,7 +271,7 @@ const Dashboard = () => {
                     <Button 
                       variant="default" 
                       size="sm"
-                      onClick={() => setIsCalendarOpen(false)}
+                      onClick={handleSearch}
                     >
                       Apply
                     </Button>
@@ -241,13 +281,38 @@ const Dashboard = () => {
             )}
           </div>
           
-          <Button variant="default" className="bg-blue-600 text-white h-12 px-8 ml-4 rounded-lg text-base font-medium">
+          <Button 
+            variant="default" 
+            className="bg-blue-600 text-white h-12 px-8 ml-4 rounded-lg text-base font-medium"
+            onClick={handleSearch}
+          >
             SEARCH
           </Button>
         </div>
       </div>
 
-      {/* Success Rate Card */}
+      {isLoading && (
+        <div className="text-center py-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-2 text-gray-600">Loading data...</p>
+        </div>
+      )}
+      
+      {error && (
+        <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-red-700">{error}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="bg-white shadow rounded-lg p-6">
           <h2 className="text-lg font-semibold mb-4">Success Rate</h2>
@@ -280,9 +345,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Transactions Chart */}
         <div className="bg-white shadow rounded-lg p-6">
           <h2 className="text-lg font-semibold mb-4">Transactions Aggregated</h2>
           <div className="mb-4 flex space-x-2">
@@ -306,22 +369,27 @@ const Dashboard = () => {
             </button>
           </div>
           <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={transactionData[transactionTimeframe]}
-                margin={{ top: 5, right: 20, left: 20, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                <YAxis axisLine={false} tickLine={false} />
-                <Tooltip />
-                <Bar dataKey="value" fill="#FFC107" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            {!isLoading && transactionData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={transactionData}
+                  margin={{ top: 5, right: 20, left: 20, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} />
+                  <YAxis axisLine={false} tickLine={false} />
+                  <Tooltip />
+                  <Bar dataKey="value" fill="#FFC107" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : !isLoading && transactionData.length === 0 ? (
+              <div className="h-full flex items-center justify-center">
+                <p className="text-gray-500">No transaction data available for selected period</p>
+              </div>
+            ) : null}
           </div>
         </div>
 
-        {/* Users Chart */}
         <div className="bg-white shadow rounded-lg p-6">
           <h2 className="text-lg font-semibold mb-4">Users Aggregated</h2>
           <div className="mb-4 flex space-x-2">
@@ -345,22 +413,27 @@ const Dashboard = () => {
             </button>
           </div>
           <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={userData[usersTimeframe]}
-                margin={{ top: 5, right: 20, left: 20, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                <YAxis axisLine={false} tickLine={false} />
-                <Tooltip />
-                <Bar dataKey="value" fill="#F472B6" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            {!isLoading && userData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={userData}
+                  margin={{ top: 5, right: 20, left: 20, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} />
+                  <YAxis axisLine={false} tickLine={false} />
+                  <Tooltip />
+                  <Bar dataKey="value" fill="#F472B6" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : !isLoading && userData.length === 0 ? (
+              <div className="h-full flex items-center justify-center">
+                <p className="text-gray-500">No user data available for selected period</p>
+              </div>
+            ) : null}
           </div>
         </div>
 
-        {/* First Time Users Card */}
         <div className="bg-white shadow rounded-lg p-6">
           <h2 className="text-lg font-semibold mb-4">First Time Users</h2>
           <div className="h-64 bg-gray-50 rounded flex items-center justify-center">
@@ -368,7 +441,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Repeat Users Card */}
         <div className="bg-white shadow rounded-lg p-6">
           <h2 className="text-lg font-semibold mb-4">Repeat Users</h2>
           <div className="h-64 bg-gray-50 rounded flex items-center justify-center">
