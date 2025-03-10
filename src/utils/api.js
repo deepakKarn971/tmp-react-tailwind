@@ -97,24 +97,41 @@ export const processAnalyticsResponse = (response) => {
   if (!response || !response.data) {
     return {
       successRate: null,
-      transactionData: [],
-      userData: []
+      transactionData: []
     };
   }
 
   const data = response.data;
   
-  // Find the success rate data (index 2 in the provided example)
-  const successRateData = data.find(item => item && item.title === "Success Rate") || null;
+  // Check if data is an array of objects (success rate format)
+  if (data.some(item => item && typeof item === 'object' && item.title === "Success Rate")) {
+    const successRateData = data.find(item => item && item.title === "Success Rate") || null;
+    return {
+      successRate: successRateData,
+      transactionData: []
+    };
+  }
   
-  // Process other data arrays as needed for transactions and users
-  // For now, we'll return placeholders, but you can expand this as needed
+  // Check if data is in the transaction format (array of arrays)
+  if (Array.isArray(data) && data.length > 0 && Array.isArray(data[0])) {
+    // Skip the header row (index 0)
+    const processedData = data.slice(1).map(item => {
+      return {
+        name: item[0],
+        value: parseInt(item[1], 10)
+      };
+    });
+    
+    return {
+      successRate: null,
+      transactionData: processedData
+    };
+  }
   
+  // Default return if data format doesn't match known patterns
   return {
-    successRate: successRateData,
-    // Add other processed data as needed
-    transactionData: [],
-    userData: []
+    successRate: null,
+    transactionData: []
   };
 };
 
