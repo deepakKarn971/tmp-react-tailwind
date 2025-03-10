@@ -96,11 +96,13 @@ export const fetchDashboardData = (params = {}) => {
 /**
  * Fetch data points for dashboard metrics
  * @param {Object} payload - Data containing range, fromDate, toDate
+ * @param {Object} customHeaders - Optional custom headers to include in the request
  * @returns {Promise<Object>} - Data points analytics
  */
-export const fetchDataPoints = (payload) => {
+export const fetchDataPoints = (payload, customHeaders = {}) => {
   return fetchApi("/dashboard/merchant-dashboard/v1/analytics/data-points", {
     method: "POST",
     body: JSON.stringify(payload),
+    headers: customHeaders
   });
 };
