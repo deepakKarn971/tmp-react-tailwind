@@ -62,7 +62,7 @@ export const loginApi = (email, password) => {
 };
 
 /**
- * Fetch analytics data for dashboard graphs
+ * Fetch analytics data for dashboard graphs using POST request
  * @param {string} graphType - Type of graph (transactions, users, etc.)
  * @param {string} range - Range period (7days, 30days, 12months)
  * @param {Date} fromDate - Start date for the range
@@ -70,22 +70,26 @@ export const loginApi = (email, password) => {
  * @returns {Promise<Object>} - Graph data and options
  */
 export const fetchAnalyticsData = (graphType, range, fromDate, toDate) => {
-  const params = new URLSearchParams();
-  params.append('graphType', graphType);
+  const payload = {
+    graphType: graphType
+  };
   
   if (range) {
-    params.append('range', range);
+    payload.range = range;
   }
   
   if (fromDate) {
-    params.append('fromDate', fromDate.toISOString().split('T')[0]);
+    payload.fromDate = fromDate.toISOString().split('T')[0];
   }
   
   if (toDate) {
-    params.append('toDate', toDate.toISOString().split('T')[0]);
+    payload.toDate = toDate.toISOString().split('T')[0];
   }
   
-  return fetchApi(`/dashboardmerchant-dashboard/v1/analytics/aggregated?${params.toString()}`);
+  return fetchApi("/dashboardmerchant-dashboard/v1/analytics/aggregated", {
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
 };
 
 /**
