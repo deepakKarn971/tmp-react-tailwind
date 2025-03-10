@@ -2,9 +2,11 @@ import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
-import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import DashboardLayout from "./components/layout/DashboardLayout";
+
+// Placeholder component for the dashboard home
+const DashboardHome = () => <div className="p-8"><h1 className="text-2xl font-bold">Dashboard Home</h1></div>;
 
 // Placeholder components for dashboard routes
 const Components = () => <div className="p-8"><h1 className="text-2xl font-bold">Components Page</h1></div>;
@@ -31,7 +33,7 @@ const App = () => (
       
       {/* Dashboard routes with common layout */}
       <Route path="/dashboard" element={<DashboardLayout />}>
-        <Route index element={<Dashboard />} />
+        <Route index element={<DashboardHome />} />
         <Route path="components" element={<Components />} />
         
         {/* Report routes */}
