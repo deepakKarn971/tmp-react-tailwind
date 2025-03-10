@@ -127,8 +127,19 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     },
   ];
 
+  // Add a toggle button that's positioned at the top right of the sidebar
+  const SidebarToggleButton = () => (
+    <button 
+      className="absolute top-4 right-[-12px] bg-white rounded-full p-1 shadow-md border border-gray-200 hover:bg-gray-100 transition-colors z-10"
+      onClick={toggleSidebar}
+      aria-label={isOpen ? "Close sidebar" : "Open sidebar"}
+    >
+      {isOpen ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+    </button>
+  );
+
   if (!isOpen) return (
-    <div className="w-12 bg-white border-r border-gray-200 h-[calc(100vh-64px)] flex items-center justify-center">
+    <div className="w-12 bg-white border-r border-gray-200 h-[calc(100vh-64px)] flex items-center justify-center relative">
       <button 
         className="p-2 rounded-full bg-primary text-white hover:bg-primary/90 transition-colors"
         onClick={toggleSidebar}
@@ -136,11 +147,13 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       >
         <ChevronRight size={20} />
       </button>
+      <SidebarToggleButton />
     </div>
   );
 
   return (
     <aside className="w-64 bg-white border-r border-gray-200 h-[calc(100vh-64px)] overflow-y-auto relative">
+      <SidebarToggleButton />
       <div className="py-4 flex flex-col h-full">
         <div className="flex items-center justify-between px-4 mb-6">
           <div className="flex items-center">
@@ -242,4 +255,3 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 };
 
 export default Sidebar;
-
