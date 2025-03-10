@@ -56,7 +56,7 @@ const ForgotPassword = () => {
 
           <button
             type="submit"
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
+            className="w-full flex justify-center py-2 px-4 border border-transparent rounded shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
             disabled={isSubmitted}
           >
             {isSubmitted ? "SENDING..." : "SEND RESET LINK"}
