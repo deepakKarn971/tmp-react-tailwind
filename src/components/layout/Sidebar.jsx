@@ -68,7 +68,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   // Toggle button that appears on the right edge of the sidebar
   const SidebarToggleButton = () => (
     <button 
-      className="absolute top-20 -right-4 bg-white rounded-full p-1.5 shadow-md border border-gray-200 hover:bg-gray-100 transition-colors z-10"
+      className="absolute -right-3 top-20 bg-white rounded-full p-1.5 shadow-md border border-gray-200 hover:bg-gray-100 transition-colors z-20"
       onClick={toggleSidebar}
       aria-label={isOpen ? "Close sidebar" : "Open sidebar"}
     >
@@ -82,7 +82,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       <Link
         key={index}
         to={item.path}
-        className={`flex items-center pl-12 py-2.5 text-sm rounded-lg ${
+        className={`flex items-center pl-12 py-2.5 text-sm ${
           isActive(item.path) 
             ? "text-primary font-medium" 
             : "text-gray-600 hover:bg-gray-100"
@@ -104,7 +104,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           <div key={index} className="mb-2 w-full px-2">
             {item.hasSubmenu ? (
               <button
-                className={`p-3 rounded-lg w-full flex justify-center ${
+                className={`p-3 w-full flex justify-center ${
                   expandedMenus[item.key] || isSubmenuActive(item.key) ? "bg-gray-100" : ""
                 } text-gray-500 hover:bg-gray-100`}
                 onClick={() => toggleSubmenu(item.key)}
@@ -115,7 +115,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             ) : (
               <Link
                 to={item.path}
-                className={`p-3 rounded-lg w-full flex justify-center ${
+                className={`p-3 w-full flex justify-center ${
                   isActive(item.path) ? "bg-primary text-white" : "text-gray-500 hover:bg-gray-100"
                 }`}
                 aria-label={item.title}
@@ -141,7 +141,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               <div>
                 <button
                   onClick={() => toggleSubmenu(item.key)}
-                  className={`flex items-center w-full px-3 py-2.5 rounded-lg ${
+                  className={`flex items-center w-full px-3 py-2.5 ${
                     expandedMenus[item.key] || isSubmenuActive(item.key) ? "bg-gray-100" : ""
                   } text-gray-700 hover:bg-gray-100`}
                 >
@@ -164,7 +164,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             ) : (
               <Link
                 to={item.path}
-                className={`flex items-center px-3 py-2.5 rounded-lg ${
+                className={`flex items-center px-3 py-2.5 ${
                   isActive(item.path) 
                     ? "bg-primary text-white font-medium" 
                     : "text-gray-700 hover:bg-gray-100"
