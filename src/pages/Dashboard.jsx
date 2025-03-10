@@ -1,11 +1,19 @@
 
 import React, { useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { TrendingUp } from "lucide-react";
+import { TrendingUp, Calendar, ChevronDown } from "lucide-react";
+import { format } from "date-fns";
+import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
+import { Calendar as CalendarComponent } from "../components/ui/calendar";
+import { Button } from "../components/ui/button";
+import { cn } from "../lib/utils";
 
 const Dashboard = () => {
   const [transactionTimeframe, setTransactionTimeframe] = useState("7days");
   const [usersTimeframe, setUsersTimeframe] = useState("7days");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [selectedDateFilter, setSelectedDateFilter] = useState("Last 30 Days");
+  const [date, setDate] = useState(null);
 
   // Mock transaction data
   const transactionData = {
@@ -54,25 +62,72 @@ const Dashboard = () => {
     ],
   };
 
+  const dateFilterOptions = [
+    "Last 30 Days",
+    "Last 7 Days",
+    "Yesterday"
+  ];
+
+  const handleDateFilterChange = (option) => {
+    setSelectedDateFilter(option);
+    setIsDropdownOpen(false);
+  };
+
   return (
     <div className="space-y-8">
       {/* Header with title and date filter */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Dashboard</h1>
         <div className="flex gap-4">
+          {/* Custom dropdown with options */}
           <div className="relative">
-            <select className="bg-white border border-gray-200 rounded px-4 py-2 appearance-none pr-8 cursor-pointer">
-              <option>Last 30 Days</option>
-              <option>Last 7 Days</option>
-              <option>Last 12 Months</option>
-            </select>
-            <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
-              <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-              </svg>
-            </div>
+            <Button
+              className="flex items-center gap-2 bg-white text-gray-800 border border-gray-200 rounded"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            >
+              <Calendar size={16} />
+              <span>{selectedDateFilter}</span>
+              <ChevronDown size={16} />
+            </Button>
+            
+            {isDropdownOpen && (
+              <div className="absolute top-full mt-1 right-0 bg-white border border-gray-200 rounded shadow-lg z-10 w-48">
+                <ul className="py-1">
+                  {dateFilterOptions.map((option) => (
+                    <li 
+                      key={option} 
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => handleDateFilterChange(option)}
+                    >
+                      {option}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
-          <input type="text" placeholder="Select Date" className="bg-white border border-gray-200 rounded px-4 py-2" />
+          
+          {/* Date Picker */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="bg-white border border-gray-200 rounded text-gray-800 px-4 py-2"
+              >
+                {date ? format(date, "PPP") : "Select Date"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0 z-50 bg-white" align="end">
+              <CalendarComponent
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                initialFocus
+                className="p-3 pointer-events-auto"
+              />
+            </PopoverContent>
+          </Popover>
+          
           <button className="bg-blue-600 text-white px-6 py-2 rounded">SEARCH</button>
         </div>
       </div>
