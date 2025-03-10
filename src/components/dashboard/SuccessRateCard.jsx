@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { ArrowUp, ArrowDown } from "lucide-react";
 import { fetchDataPoints } from "../../utils/api";

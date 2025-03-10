@@ -7,6 +7,7 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://merchant-cug.twidpay.com";
 import { getCookie, checkCookie } from "./cookieUtils";
 import { AUTH_CONFIG } from "../config/env";
+import { format } from "date-fns";
 
 /**
  * Makes a fetch request with common headers and error handling
@@ -100,9 +101,16 @@ export const fetchDashboardData = (params = {}) => {
  * @returns {Promise<Object>} - Data points analytics
  */
 export const fetchDataPoints = (payload, customHeaders = {}) => {
+  // Format dates to YYYY-MM-DD if they exist
+  const formattedPayload = {
+    ...payload,
+    fromDate: payload.fromDate ? format(new Date(payload.fromDate), "yyyy-MM-dd") : undefined,
+    toDate: payload.toDate ? format(new Date(payload.toDate), "yyyy-MM-dd") : undefined,
+  };
+
   return fetchApi("/dashboard/merchant-dashboard/v1/analytics/data-points", {
     method: "POST",
-    body: JSON.stringify(payload),
+    body: JSON.stringify(formattedPayload),
     headers: customHeaders
   });
 };
