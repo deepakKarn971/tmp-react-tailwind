@@ -57,6 +57,11 @@
   html {
     scroll-behavior: smooth;
   }
+
+  /* Add default styling for input elements to remove rounded corners */
+  input {
+    @apply rounded-none;
+  }
 }
 
 @layer components {
