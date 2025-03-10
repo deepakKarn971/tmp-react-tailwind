@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -58,9 +57,9 @@
     scroll-behavior: smooth;
   }
 
-  /* Add default styling for input elements to remove rounded corners */
+  /* Add default styling for input elements with rounded corners */
   input {
-    @apply rounded-none;
+    @apply rounded-md;
   }
 }
 
