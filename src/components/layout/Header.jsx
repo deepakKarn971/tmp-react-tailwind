@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronDown, LogOut, User, Menu } from "lucide-react";
@@ -19,7 +18,6 @@ const Header = ({ toggleSidebar }) => {
     navigate("/auth/login");
   };
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -39,7 +37,7 @@ const Header = ({ toggleSidebar }) => {
         <div className="flex items-center">
           <button 
             onClick={toggleSidebar}
-            className="p-2 mr-3 rounded-md hover:bg-gray-100"
+            className="p-2 mr-3 rounded hover:bg-gray-100"
             aria-label="Toggle sidebar"
           >
             <Menu size={20} />
@@ -51,7 +49,7 @@ const Header = ({ toggleSidebar }) => {
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={toggleDropdown}
-              className="flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 rounded-md px-3 py-2 transition-colors duration-200"
+              className="flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 rounded px-3 py-2 transition-colors duration-200"
             >
               <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-600">
                 <User size={18} />
@@ -61,7 +59,7 @@ const Header = ({ toggleSidebar }) => {
             </button>
 
             {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-full min-w-[192px] bg-white rounded-md shadow-lg py-1 z-50">
+              <div className="absolute right-0 mt-2 w-full min-w-[192px] bg-white rounded shadow-lg py-1 z-50">
                 <div className="px-4 py-3 border-b border-gray-100">
                   <p className="text-sm font-semibold">Account Actions</p>
                 </div>

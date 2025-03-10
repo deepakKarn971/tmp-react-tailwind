@@ -68,7 +68,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   // Toggle button that appears on the right edge of the sidebar
   const SidebarToggleButton = () => (
     <button 
-      className="absolute -right-3 top-20 bg-white rounded-full p-1.5 shadow-md border border-gray-200 hover:bg-gray-100 transition-colors z-20"
+      className="absolute -right-3 top-20 bg-white rounded p-1.5 shadow-md border border-gray-200 hover:bg-gray-100 transition-colors z-20"
       onClick={toggleSidebar}
       aria-label={isOpen ? "Close sidebar" : "Open sidebar"}
     >
